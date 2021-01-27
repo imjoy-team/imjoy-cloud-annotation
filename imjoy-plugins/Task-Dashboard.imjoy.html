@@ -1,4 +1,4 @@
-﻿<docs lang="markdown">
+<docs lang="markdown">
 [TODO: write documentation for this plugin.]
 </docs>
 
@@ -8,7 +8,7 @@
   "type": "window",
   "tags": [],
   "ui": "",
-  "version": "0.1.0",
+  "version": "0.1.12",
   "cover": "",
   "description": "[TODO: describe this plugin with one sentence.]",
   "icon": "extension",
@@ -24,6 +24,7 @@
 </config>
 
 <script lang="javascript">
+
 class Client {
   constructor(baseURL){
     this.baseURL = baseURL
@@ -61,17 +62,22 @@ class Client {
     await auth0.loginWithPopup({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
     //logged in. you can get the user profile like this:
     const user = await auth0.getUser();
-    console.log(user);
+    if(user){
+      if(!user.email_verified){
+        api.alert(`Please verify your email (${user.email}) by clicking the link sent from Auth0.`)
+        return
+      }
+      this.userInfo = user;
+      console.log(user);
+    }
     this.auth0 = auth0;
-    this.userInfo = user;
-    if(user['https://api.imjoy.io/roles'].includes('admin'))
-      this.isAdmin = true
-    else
-      this.isAdmin = false
     this.accessToken = await auth0.getTokenSilently({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
-    
   }
   async logout(){
+    if(!this.auth0) {
+      api.showMessage("You haven't logged in.")
+      return;
+    }
     await this.auth0.logout();
   }
   async get(url){
@@ -127,19 +133,20 @@ const app = new Vue({
   methods: {
     async login(){
       this.$vs.loading()
+      debugger
       try{
         this.client = new Client(this.baseUrl)
         this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
         this.selectTask(this.tasks[Object.keys(this.tasks)[0]])
       }
       catch(e){
-        api.alert('Failed to connect to the backend server')
+        api.alert(`Failed to connect to the backend server, error: ${e}`)
       }
       finally{
         this.$vs.loading.close()
       }
     },
-    async showInfo(){
+    async showToken(){
       api.alert(`Authorization Token:\n\n ${this.client.accessToken} \n\n(Use it in the HTTP "Authorization" header to access from other client.)`)
     },
     async reloadTasks(){
@@ -286,15 +293,13 @@ api.export(new ImJoyPlugin())
 
 <window lang="html">
    <div id="app">
-     <h1>ImJoy Task Dashboard <vs-input
+     <h1>Task Dashboard <vs-input
         label="Server URL"
         v-model="baseUrl"
         placeholder="https://api.imjoy.io"
       ></vs-input></h1>
      
      <vs-button v-if="!client || !client.accessToken" style="left: 50%;top: 100;transform: translate(-50%, 0px);" @click="login()" icon="login">Login</vs-button>
-     <vs-button v-if="client && client.accessToken"  type="line" @click="showInfo()" icon="info">Info</vs-button>
-     <vs-button v-if="this.tasks" type="line" @click="reloadTasks()" icon="refresh">Reload Tasks</vs-button>
      <vs-dropdown v-if="this.tasks && tasks&&Object.keys(tasks).length>0">
        <vs-button type="line" icon="expand_more">{{selectedTask?selectedTask.name:'Tasks'}}</vs-button>
       <vs-dropdown-menu>
@@ -302,9 +307,22 @@ api.export(new ImJoyPlugin())
           {{task.name}}
         </vs-dropdown-item>
       </vs-dropdown-menu>
-   
     </vs-dropdown>
     <vs-button v-if="this.tasks" type="line" @click="newTask()" icon="add">New Task</vs-button>
+    <vs-dropdown v-if="client && client.accessToken" >
+      <vs-button type="line" icon="more_horiz">More</vs-button>
+      <vs-dropdown-menu>
+        <vs-dropdown-item @click="reloadTasks()" icon="refresh">
+          Reload Tasks
+        </vs-dropdown-item>
+        <vs-dropdown-item @click="showToken()" icon="info">
+          Connection Token
+        </vs-dropdown-item>
+        <vs-dropdown-item @click="client.logout()">
+          Logout
+        </vs-dropdown-item>
+      </vs-dropdown-menu>
+    </vs-dropdown>
       <br>
       <p v-if="tasks && showCard == 'status' && !taskInfo">No task selected.</p>
       <vs-card v-if="showCard == 'status' && taskInfo" style="display: inline-block;">
