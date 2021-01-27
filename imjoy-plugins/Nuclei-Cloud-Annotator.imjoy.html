@@ -1,0 +1,263 @@
+﻿<docs>
+Documentation of API: https://ai.pasteur.fr/docs
+</docs>
+
+<config lang="json">
+{
+  "name": "Nuclei-Cloud-Annotator",
+  "type": "iframe",
+  "tags": [],
+  "ui": "",
+  "version": "0.1.0",
+  "cover": "",
+  "description": "Inspect and correct nuclear segmentation results",
+  "icon": "extension",
+  "inputs": null,
+  "outputs": null,
+  "api_version": "0.1.8",
+  "env": "",
+  "permissions": [],
+  "requirements": ["https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js", "https://cdn.auth0.com/js/auth0-spa-js/1.12/auth0-spa-js.production.js"],
+  "dependencies": []
+}
+</config>
+
+<script lang="javascript">
+
+const TASK_ID = 'demo-annotate-nuclei'
+const BASE_URL = 'https://api.imjoy.io'
+
+
+class Client {
+  constructor(baseURL){
+    this.baseURL = baseURL
+    this.accessToken = null
+  }
+  async makeRequest(url, method, json){
+    if(!this.accessToken) {
+      await this.login()
+    }
+    if(!url.startsWith('http') && !url.startsWith('/')) url = this.baseURL + '/' + url;
+    const headers = {'Authorization': `Bearer ${this.accessToken}`}
+    let body = undefined
+    if(json){
+        headers['Content-Type'] = 'application/json'
+        body = JSON.stringify(json)
+    }
+    const response = await fetch(url, {
+      method,
+      headers,
+      body
+    })
+    const data = await response.json()
+    if(data.success){
+      return data.result
+    }
+    else{
+      throw new Error(data.error)
+    }
+  }
+  async login(){
+    const auth0 = await createAuth0Client({
+      domain: 'imjoy.eu.auth0.com',
+      client_id: 'ofsvx6A7LdMhG0hklr5JCAEawLv4Pyse'
+    })
+    await auth0.loginWithPopup({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
+    //logged in. you can get the user profile like this:
+    const user = await auth0.getUser();
+    if(!user.email_verified){
+      api.alert(`Please verify your email (${user.email}) by clicking the link sent from Auth0.`)
+      return
+    }
+    console.log(user);
+    this.auth0 = auth0;
+    this.userInfo = user;
+    if(user['https://api.imjoy.io/roles'].includes('admin'))
+      this.isAdmin = true
+    else
+      this.isAdmin = false
+    this.accessToken = await auth0.getTokenSilently({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
+  }
+  async logout(){
+    await this.auth0.logout();
+  }
+  async get(url){
+    return this.makeRequest(url, 'GET')
+  }
+  async put(url, json){
+    return this.makeRequest(url, 'PUT', json)
+  }
+  async post(url, json){
+    return this.makeRequest(url, 'POST', json)
+  }
+  async delete(url){
+    return this.makeRequest(url, 'DELETE')
+  }
+}
+
+class ImJoyPlugin {
+  async setup() {
+    this.userInfo = {}
+    this.task_id = TASK_ID
+    this.client = new Client(BASE_URL)
+    api.log('initialized!')
+  }
+
+  async login(){
+    await this.client.login()
+    try{
+      this.task_info = await this.client.get(`${BASE_URL}/task/${this.task_id}`)          
+      const samples = await this.client.get(`${BASE_URL}/task/${this.task_id}/all`)
+      const nodes = samples.map(s => ({title:s, isLeaf: true}))
+      await this.task_tree.clear_nodes()
+      await  this.task_tree.set_nodes(nodes)
+      api.showMessage("Successfully logged in.")
+    }
+    catch(e){
+      api.alert(`Failed to access the task(${this.task_id}, error: ${e}`) 
+    }
+  }
+
+  async getSample(){
+    return await this.client.get(`${BASE_URL}/task/${this.task_id}/sample`)
+  }
+
+  async getTaskInfo(){
+    return await this.client.get(`${BASE_URL}/task/${this.task_id}`)
+  }
+
+  async saveAnnotation(features){
+    try{
+      const sample = this.current_sample
+      const url = sample.target_files['annotation.json']
+      const options = {
+        // headers: {'Content-Type': file.type},
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round(1.0 * progressEvent.loaded / file.size * 100.0)
+          api.showMessage("uploading annotation, size: "+Math.round(file.size/1000000)+"MB, " + progress + "% uploaded.");
+        }
+      };
+      const file = new File([JSON.stringify(features)], "annotation.json", {type:"application/json"})
+      await axios.put(url, file, options)
+    }
+    catch(e){
+      api.alert(`Failed to save annotation, error: ${e}`)
+    }
+  }
+
+  async markComplete(){
+    return await this.client.post(`${BASE_URL}/task/${this.task_id}/sample/${this.current_sample.session_id}/complete`)
+  }
+
+  async sample_dbclick_callback(node){
+      const sample = await this.client.get(`${BASE_URL}/task/${this.task_id}/sample/${node.title}/update`)
+      this.viewer.clear_layers()
+  
+      for(const k of Object.keys(sample.input_files)){
+        await this.viewer.view_image(sample.input_files[k], {name: k})
+      }
+      this.annotation_layer = await this.viewer.add_shapes([], this.task_info['client_config'])
+      const geojson_url = sample.placeholder_files['annotation.json']
+      if(geojson_url){
+        const r= await fetch(geojson_url)
+        const features = await r.json()
+        await this.annotation_layer.add_features(features)
+      }
+      this.current_sample = sample
+    }
+
+  async run(ctx) {
+    const viewer = await api.showDialog({src: "https://kaibu.org/#/app", name: "Kaibu"})
+    const me = this;
+    me.viewer = viewer;
+
+    await viewer.add_widget({
+        "_rintf": true,
+        "name": "Control",
+        "type": "control",
+        "elements": [
+            {
+                "type": "button",
+                "label": "Login",
+                async callback(){
+                  await me.login()
+                },
+            },
+            {
+                "type": "button",
+                "label": "Logout",
+                async callback(){
+                  await me.client.logout();
+                },
+            },
+            {
+                "type": "button",
+                "label": "Get Sample",
+                async callback(){
+                  const sample = await me.getSample()
+                  viewer.clear_layers()
+                  for(const k of Object.keys(sample.input_files)){
+                    await viewer.view_image(sample.input_files[k], {name: k})
+                  }
+                  me.annotation_layer = await viewer.add_shapes([], me.task_info['client_config'])
+                  const geojson_url = sample.placeholder_files['annotation.json']
+                  if(geojson_url){
+                    const r= await fetch(geojson_url)
+                    const features = await r.json()
+                    await me.annotation_layer.add_features(features)
+                  }
+                  me.current_sample = sample
+                  
+                },
+            },
+
+            {
+                "type": "button",
+                "label": "Status",
+                async callback(){
+                  const info = await me.getTaskInfo()
+                  api.alert(`Task: ${info.name}\n Progress: ${info.completed}/ ${info.all_samples}`)
+                },
+            },
+
+            {
+                "type": "button",
+                "label": "Save",
+                async callback(){
+                  if(me.current_sample){
+                    const features = await me.annotation_layer.get_features()
+                    await me.saveAnnotation(features)
+                  }
+                },
+            },
+            {
+                "type": "button",
+                "label": "Submit",
+                async callback(){
+                  if(me.current_sample){
+                    const features = await me.annotation_layer.get_features()
+                    await me.saveAnnotation(features)
+                    await me.markComplete()
+                    await viewer.clear_layers()
+                  }
+                },
+            },
+
+        ],
+    })
+
+    this.task_tree = await viewer.add_widget(
+        {
+            "_rintf": true,
+            "type": "tree",
+            "name": "Samples",
+            "node_dbclick_callback": me.sample_dbclick_callback.bind(me),
+            "nodes": [{"title": 'No Samples available'}],
+        }
+    )
+    
+  }
+}
+
+api.export(new ImJoyPlugin())
+</script>
