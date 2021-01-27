@@ -133,7 +133,6 @@ const app = new Vue({
   methods: {
     async login(){
       this.$vs.loading()
-      debugger
       try{
         this.client = new Client(this.baseUrl)
         this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
@@ -175,30 +174,34 @@ const app = new Vue({
     },
     initTaskInfo(){
       this.taskInfo.last_id = this.taskInfo.id
-      this.taskInfo.client_config_str = JSON.stringify(this.taskInfo.client_config)
-      this.taskInfo.input_files_str = JSON.stringify(this.taskInfo.input_files)
-      this.taskInfo.target_files_str = JSON.stringify(this.taskInfo.target_files)
-      this.taskInfo.white_list_str = JSON.stringify(this.taskInfo.white_list)
+      this.taskInfo.client_config = JSON.stringify(this.taskInfo.client_config)
+      this.taskInfo.input_files = JSON.stringify(this.taskInfo.input_files)
+      this.taskInfo.target_files = JSON.stringify(this.taskInfo.target_files)
+      this.taskInfo.white_list = JSON.stringify(this.taskInfo.white_list)
+      this.taskInfo.owners = this.taskInfo.owners.join(",")
       this.progress = this.taskInfo.completed/this.taskInfo.all_samples * 100
     },
     async saveTask(taskId){
       const taskInfo = Object.assign({}, this.taskInfo)
       delete taskInfo.last_id
-      if(taskInfo.client_config_str){
-        taskInfo.client_config = JSON.parse(taskInfo.client_config_str)
-        delete taskInfo.client_config_str
+      if(taskInfo.client_config){
+        taskInfo.client_config = JSON.parse(taskInfo.client_config)
       }
-      if(taskInfo.input_files_str){
-        taskInfo.input_files = JSON.parse(taskInfo.input_files_str)
-        delete taskInfo.input_files_str
+      if(taskInfo.input_files){
+        taskInfo.input_files = JSON.parse(taskInfo.input_files)
       }
-      if(taskInfo.target_files_str){
-        taskInfo.target_files = JSON.parse(taskInfo.target_files_str)
-        delete taskInfo.target_files_str
+      if(taskInfo.target_files){
+        taskInfo.target_files = JSON.parse(taskInfo.target_files)
       }
-      if(taskInfo.white_list_str){
-        taskInfo.white_list = JSON.parse(taskInfo.white_list_str)
-        delete taskInfo.white_list_str
+      if(taskInfo.white_list){
+        taskInfo.white_list = JSON.parse(taskInfo.white_list)
+      }
+      const owners = taskInfo.owners.split(',')
+      taskInfo.owners = []
+      for(let o of owners){
+        if(!taskInfo.owners.includes(o)){
+          taskInfo.owners.push(o)
+        }
       }
       delete taskInfo.all_samples
       delete taskInfo.completed
@@ -359,16 +362,21 @@ api.export(new ImJoyPlugin())
             v-model="taskInfo.dataset_dir"
             placeholder=""
           ></vs-input>
+          <vs-input
+            label="Owners (seperate by comma)"
+            v-model="taskInfo.owners"
+            placeholder=""
+          ></vs-input>
           <label for="">Allow User Upload</label>
           <vs-switch v-model="taskInfo.allow_user_upload"></vs-switch>
           <vs-input
             label="Input Files"
-            v-model="taskInfo.input_files_str"
+            v-model="taskInfo.input_files"
             placeholder=""
           ></vs-input>
           <vs-input
             label="Target Files"
-            v-model="taskInfo.target_files_str"
+            v-model="taskInfo.target_files"
             placeholder=""
           ></vs-input>
           <vs-select
@@ -402,7 +410,7 @@ api.export(new ImJoyPlugin())
           <vs-input
             v-if="taskInfo.task_visibility=='protected'"
             label="Whitelist Users"
-            v-model="taskInfo.white_list_str"
+            v-model="taskInfo.white_list"
             placeholder=""
           ></vs-input>
           
@@ -434,7 +442,7 @@ api.export(new ImJoyPlugin())
             placeholder="3600"
             min="1"
           ></vs-input>
-          <vs-textarea label="Client Config" v-model="taskInfo.client_config_str" placeholder="{}"> </vs-textarea>
+          <vs-textarea label="Client Config" v-model="taskInfo.client_config" placeholder="{}"> </vs-textarea>
           <vs-button v-if="taskInfo.last_id == taskInfo.id" type="border" @click="saveTask()" icon="save">Save Task</vs-button>
           <vs-button v-else type="border" @click="saveNewTask()" icon="add">Save New Task</vs-button>
           &nbsp;&nbsp;
