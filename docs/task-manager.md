@@ -25,10 +25,12 @@ To define a new task or modify an existing task, follow these steps:
     ![task-dashboard-login](assets/task-dashboard-login.jpg ':size=200')
 3. **Dashboard**. After the login, the dashboard will be shown.
 
-   - `Info`: shows connection token for currently selected task, which is needed to upload data.
-   - `Reload tasks`: will update the task list and their status.
-   - `New Task`: create a new task.
+   - `+ New Task`: create a new task.
    - Dropdown menu: lists all available tasks on the task server.
+   - `... More`:
+       - `Reload tasks`: will update the task list and their status.
+       - `Connection Token`: display token for currently selected task, which is needed to upload data.
+       - `Logout`: logout with current user.
 
     ![task-dashboard](assets/task-dashboard.jpg ':size=200')
 
@@ -40,18 +42,28 @@ ID                      | string     | Unique identifier for a task.
 Name                    | string     | Name of the task, e.g. will be used in the dropdown menu.
 Type                    | string     | Type of task, e.g. `annotation`
 Description             | string     | Longer description of the task.
-DataSet Directory       | string     | Where data is stored. This will be automatically generated, and is called `imjoy/ID`, where `ID` is the task ID.
 Allow User upload       | True/False | Can user also upload their own data?
 Input files             | list       | List of all input files, e.g. images, that should be displayed but won't be modified.
 Target files            | list       | List of all target files, i.e. files that will be modified upon user intervention. For segmentation, this will be the segmentation results (see below).
 Sampling Method         | choise     | How the samples are selected `sequential` or `random`.
 User per sample | number | how many users can open a sample at the same time.
 Minimal completion time (s) | number | Minimal time before a user can request a new sample.
-Task visibility         | choice     | `public`: can be seen by all users, `protected`: can be seen only by users listed in the  Whitelist, and not the users in the BlackList.
+Task visibility         | choice     | `public`: can be seen by all users, except users on the `blacklist` (email addresses). `protected`: task can be seen only by users listed in `whitelist` (email addresses).
 Sample visibility       | choice     | `open`: all samples can be openly accessed,`protected`: users can only see 1 assigned sample at a time, not allowed to jump too any sample for annotation.
 Sample Status File Name | string     | Name of file that will be created once a sample has been annotated by a user.
 Expires in (s) | number | Duration after which a file will be released when being open by a user and not be resubmitted. 
 client config | string | Configuration for the client (Kaibu). The proposed default creates a vector layer for polygon annotation.
+
+### Public vs private tasks
+
+An important aspects is privacy. Both the annotation tools and the Dashboard require a login, so 
+differentiated access policies can be put into place
+
+- A given task is **always accessible** for the user who created it and the 
+adminstrators of the AI server.
+- The `Task visibility` allows to **determine who else can see the task**. 
+  - `public` means that everybody can access a task, except users being blacklisted.
+  - `protected` means that only users listed on the `whitelist` can access the task. 
 
 ### Completing a task
 
