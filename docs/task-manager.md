@@ -42,14 +42,13 @@ ID                      | string     | Unique identifier for a task.
 Name                    | string     | Name of the task, e.g. will be used in the dropdown menu.
 Type                    | string     | Type of task, e.g. `annotation`
 Description             | string     | Longer description of the task.
-DataSet Directory       | string     | Where data is stored. This will be automatically generated, and is called `imjoy/ID`, where `ID` is the task ID.
 Allow User upload       | True/False | Can user also upload their own data?
 Input files             | list       | List of all input files, e.g. images, that should be displayed but won't be modified.
 Target files            | list       | List of all target files, i.e. files that will be modified upon user intervention. For segmentation, this will be the segmentation results (see below).
 Sampling Method         | choise     | How the samples are selected `sequential` or `random`.
 User per sample | number | how many users can open a sample at the same time.
 Minimal completion time (s) | number | Minimal time before a user can request a new sample.
-Task visibility         | choice     | `public`: can be seen by all users, `protected`: can be seen only by users listed in the  Whitelist, and not the users in the BlackList.
+Task visibility         | choice     | `public`: can be seen by all users, except users on `blacklist`. `protected`: task can be seen only by users listed in `whitelist`.
 Sample visibility       | choice     | `open`: all samples can be openly accessed,`protected`: users can only see 1 assigned sample at a time, not allowed to jump too any sample for annotation.
 Sample Status File Name | string     | Name of file that will be created once a sample has been annotated by a user.
 Expires in (s) | number | Duration after which a file will be released when being open by a user and not be resubmitted. 
