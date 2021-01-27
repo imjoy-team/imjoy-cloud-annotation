@@ -8,7 +8,7 @@
   "type": "window",
   "tags": [],
   "ui": "",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "cover": "",
   "description": "[TODO: describe this plugin with one sentence.]",
   "icon": "extension",
@@ -62,12 +62,15 @@ class Client {
     await auth0.loginWithPopup({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
     //logged in. you can get the user profile like this:
     const user = await auth0.getUser();
+    this.isAdmin = false;
     if(user){
       if(!user.email_verified){
         api.alert(`Please verify your email (${user.email}) by clicking the link sent from Auth0.`)
         return
       }
       this.userInfo = user;
+      if(user['https://api.imjoy.io/roles'].includes('admin'))
+        this.isAdmin = true
       console.log(user);
     }
     this.auth0 = auth0;
@@ -211,6 +214,9 @@ const app = new Vue({
         taskInfo.owners = []
       }
 
+      if(!this.client.isAdmin){
+        taskInfo.dataset_dir = null
+      }
       delete taskInfo.all_samples
       delete taskInfo.completed
       delete taskInfo.pending
@@ -366,6 +372,7 @@ api.export(new ImJoyPlugin())
             placeholder="A new task"
           ></vs-input>
           <vs-input
+            v-if="client.isAdmin"
             label="Dataset Directory"
             v-model="taskInfo.dataset_dir"
             placeholder=""
