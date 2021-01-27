@@ -27,7 +27,7 @@ To define a new task or modify an existing task, follow these steps:
 
    - `+ New Task`: create a new task.
    - Dropdown menu: lists all available tasks on the task server.
-   - ` ... More`:
+   - `... More`:
        - `Reload tasks`: will update the task list and their status.
        - `Connection Token`: display token for currently selected task, which is needed to upload data.
        - `Logout`: logout with current user.
