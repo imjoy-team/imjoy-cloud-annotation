@@ -48,11 +48,22 @@ Target files            | list       | List of all target files, i.e. files that
 Sampling Method         | choise     | How the samples are selected `sequential` or `random`.
 User per sample | number | how many users can open a sample at the same time.
 Minimal completion time (s) | number | Minimal time before a user can request a new sample.
-Task visibility         | choice     | `public`: can be seen by all users, except users on `blacklist`. `protected`: task can be seen only by users listed in `whitelist`.
+Task visibility         | choice     | `public`: can be seen by all users, except users on the `blacklist` (email addresses). `protected`: task can be seen only by users listed in `whitelist` (email addresses).
 Sample visibility       | choice     | `open`: all samples can be openly accessed,`protected`: users can only see 1 assigned sample at a time, not allowed to jump too any sample for annotation.
 Sample Status File Name | string     | Name of file that will be created once a sample has been annotated by a user.
 Expires in (s) | number | Duration after which a file will be released when being open by a user and not be resubmitted. 
 client config | string | Configuration for the client (Kaibu). The proposed default creates a vector layer for polygon annotation.
+
+### Public vs private tasks
+
+An important aspects is privacy. Both the annotation tools and the Dashboard require a login, so 
+differentiated access policies can be put into place
+
+- A given task is **always accessible** for the user who created it and the 
+adminstrators of the AI server.
+- The `Task visibility` allows to **determine who else can see the task**. 
+  - `public` means that everybody can access a task, except users being blacklisted.
+  - `protected` means that only users listed on the `whitelist` can access the task. 
 
 ### Completing a task
 
