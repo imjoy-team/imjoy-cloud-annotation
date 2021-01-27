@@ -65,17 +65,15 @@ class Client {
     await auth0.loginWithPopup({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
     //logged in. you can get the user profile like this:
     const user = await auth0.getUser();
-    if(!user.email_verified){
-      api.alert(`Please verify your email (${user.email}) by clicking the link sent from Auth0.`)
-      return
+    if(user){
+      if(!user.email_verified){
+        api.alert(`Please verify your email (${user.email}) by clicking the link sent from Auth0.`)
+        return
+      }
+      this.userInfo = user;
+      console.log(user);
     }
-    console.log(user);
     this.auth0 = auth0;
-    this.userInfo = user;
-    if(user['https://api.imjoy.io/roles'].includes('admin'))
-      this.isAdmin = true
-    else
-      this.isAdmin = false
     this.accessToken = await auth0.getTokenSilently({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
   }
   async logout(){
