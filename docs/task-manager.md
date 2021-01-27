@@ -25,10 +25,12 @@ To define a new task or modify an existing task, follow these steps:
     ![task-dashboard-login](assets/task-dashboard-login.jpg ':size=200')
 3. **Dashboard**. After the login, the dashboard will be shown.
 
-   - `Info`: shows connection token for currently selected task, which is needed to upload data.
-   - `Reload tasks`: will update the task list and their status.
-   - `New Task`: create a new task.
+   - `+ New Task`: create a new task.
    - Dropdown menu: lists all available tasks on the task server.
+   - ` ... More`:
+       - `Reload tasks`: will update the task list and their status.
+       - `Connection Token`: display token for currently selected task, which is needed to upload data.
+       - `Logout`: logout with current user.
 
     ![task-dashboard](assets/task-dashboard.jpg ':size=200')
 
