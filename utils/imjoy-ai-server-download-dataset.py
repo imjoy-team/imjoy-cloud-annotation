@@ -18,11 +18,10 @@ BASE_URL = "https://api.imjoy.io"
 #  * Login as an admin user and click the "Connection Token" menu item to copy the token string
 TOKEN = "PASTE YOUR TOKEN HERE"
 
-# Folder contaning the data to be uploaded (organized according to our specifications)
-#  For the demo data, this is the folder "segmentation-annotation"
-DATASET_DIR = "demo-annotate-nuclei"
+# Folder where data should be stored
+SAVE_DIR = "PASTE-PATH-TO-SAVE-DATA"
 
-# This is the task which you want to upload new samples to
+# This is the task which which you want to download
 TASK_ID = "demo-annotate-nuclei"
 
 
@@ -44,7 +43,7 @@ assert (
 ), f"Task {TASK_ID} not found, must be one of: {list(tasks.keys())}"
 
 
-os.makedirs(DATASET_DIR, exist_ok=True)
+os.makedirs(SAVE_DIR, exist_ok=True)
 
 # downloading samples
 count = 0
@@ -57,6 +56,7 @@ assert response_obj["success"] == True, "Failed to get samples"
 
 all_samples = response_obj["result"]
 chunk_size = 1024 * 100
+
 for sample_id in all_samples:
     count += 1
     print(f"===> ({count}/{len(all_samples)}) Downloading {sample_id} ...")
@@ -74,10 +74,11 @@ for sample_id in all_samples:
     result = response_obj["result"]
     if result.get("input_files"):
         continue
-    os.makedirs(os.path.join(DATASET_DIR, sample_id), exist_ok=True)
+    os.makedirs(os.path.join(SAVE_DIR, sample_id), exist_ok=True)
+    print(f'    Saving to {os.path.join(SAVE_DIR, sample_id)}')
     # upload input files
     for file_name in result["input_files"]:
-        input_file = os.path.join(DATASET_DIR, sample_id, file_name)
+        input_file = os.path.join(SAVE_DIR, sample_id, file_name)
         download_url = result["input_files"][file_name]
         response = requests.get(download_url, stream=True)
         if response.status_code == 200:
@@ -93,8 +94,8 @@ for sample_id in all_samples:
         if len(target_versions) <= 0:
             continue
         for version in target_versions:
-            os.makedirs(os.path.join(DATASET_DIR, sample_id, version), exist_ok=True)
-            target_file = os.path.join(DATASET_DIR, sample_id, version, file_name)
+            os.makedirs(os.path.join(SAVE_DIR, sample_id, version), exist_ok=True)
+            target_file = os.path.join(SAVE_DIR, sample_id, version, file_name)
             download_url = target_versions[version]
             response = requests.get(download_url, stream=True)
             if response.status_code == 200:

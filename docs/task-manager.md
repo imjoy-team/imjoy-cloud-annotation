@@ -134,3 +134,7 @@ const BASE_URL = 'https://api.imjoy.io'
 - `BASE_URL` is the URL of the task management server, here our demo server.
 
 Kaibu permits further customization of this plugin, more information can be found in the dedicated section for the client developer. 
+
+## Retrieving data
+
+Once a data-set is annotated, it can be retrieved from the storage server with the provided Python script (`utils\imjoy-ai-server-download-dataset.py`).
