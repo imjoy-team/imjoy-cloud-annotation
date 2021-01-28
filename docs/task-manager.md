@@ -134,3 +134,25 @@ const BASE_URL = 'https://api.imjoy.io'
 - `BASE_URL` is the URL of the task management server, here our demo server.
 
 Kaibu permits further customization of this plugin, more information can be found in the dedicated section for the client developer. 
+
+### Distributing of annotation plugins
+
+ImJoy provides the possiblity to distribute a plugin wiht an URL. This URL references the actual plugin that 
+should be installed, and further optional information detailing how the plugin should be installed. 
+
+As an example the URL shown below is for the Nuclei-Annotation plugin
+
+``` url
+https://imjoy.io/#/app?w=cloud-annotation&plugin=imjoy-team/imjoy-cloud-annotation:Nuclei-Cloud-Annotator@stable&upgrade=1
+```
+
+ImJoy provides a lot of flexibility for how to host your plugin codes. 
+
+1. **Any website**, including GitHub, Gist or Dropbox. For testing, we recommend using GitHub Gist.
+2. **ImJoy plugin repository**. Any GitHub respository can act as a plugin repository, and requires only the addition of one file.  provides the most flexibility and is our recommended way when you have multipled plugins.
+
+A **detailed description** for how to construct this urls and where plugin code can be hosted, can be found in the ImJoy documentation [**here**](https://imjoy.io/docs/#/development?id=generating-a-plugin-url-for-sharing)
+
+## Retrieving data
+
+Once a data-set is annotated, it can be retrieved from the storage server with the provided Python script (`utils\imjoy-ai-server-download-dataset.py`).
