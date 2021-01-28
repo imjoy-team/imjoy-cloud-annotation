@@ -155,4 +155,13 @@ A **detailed description** for how to construct this urls and where plugin code 
 
 ## Retrieving data
 
-Once a data-set is annotated, it can be retrieved from the storage server with the provided Python script (`utils\imjoy-ai-server-download-dataset.py`).
+The data belonging to a task can also be retrieved from the storage server with the provided Python script (`utils\imjoy-ai-server-download-dataset.py`).
+
+This script will download the entire data set to a user-specified folder. The data is organized as the uploaded data, 
+with one important change. The target files will be in stored in a dedicated folder in each sample folder named `target_files_vi`, 
+where `i` is a version number. `v0` is the originally provided target file, e.g. the original segmentation files, subsequent versions, e.g. `v1`, `v2` are created if for this sample a new annotation was submitted. Some important considerations
+
+- The **version numbers are chronological** and not by user. So if different users work on the same task, their annotations will not have the same version number for different samples. 
+- A completed annotation of the **same sample by the same user** will results in two distinct versions.
+
+In each `target_files` folder you will find the a **status file** (with its name specified in the Task Dashboard as `Sample Status File`) providing information about the annotation (user, date, ...). This file can thus be used to analyze annotations by different users.

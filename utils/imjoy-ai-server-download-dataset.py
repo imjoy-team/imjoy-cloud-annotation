@@ -95,8 +95,8 @@ for sample_id in all_samples:
         if len(target_versions) <= 0:
             continue
         for version in target_versions:
-            os.makedirs(os.path.join(SAVE_DIR, sample_id, version), exist_ok=True)
-            target_file = os.path.join(SAVE_DIR, sample_id, version, file_name)
+            os.makedirs(os.path.join(SAVE_DIR, sample_id, f'target_files_{version}'), exist_ok=True)
+            target_file = os.path.join(SAVE_DIR, sample_id,  f'target_files_{version}', file_name)
             download_url = target_versions[version]
             response = requests.get(download_url, stream=True)
             if response.status_code == 200:
