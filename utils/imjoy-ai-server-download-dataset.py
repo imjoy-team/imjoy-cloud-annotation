@@ -72,8 +72,8 @@ for sample_id in all_samples:
         print("Failed to download "+response_obj["error"])
         continue
     result = response_obj["result"]
-    #if result.get("input_files"):
-    #    continue
+    if not result.get("input_files"):
+        continue
     os.makedirs(os.path.join(SAVE_DIR, sample_id), exist_ok=True)
     print(f'    Saving to {os.path.join(SAVE_DIR, sample_id)}')
     
