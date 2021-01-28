@@ -13,9 +13,9 @@ To directly try this annotation plugin in the browser, press the `Run` button be
 class ImJoyPlugin {
     async setup() {}
     async run(ctx) {
-        const imjoy = api; 
-        const plugin = await imjoy.getPlugin("https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/Nuclei-Cloud-Annotator.imjoy.html")
-        await plugin.run({config: {}, data: {}})
+        const imjoy = await api.createWindow({src: "https://imjoy.io/#/app?w=sandbox", name: "ImJoy"})
+        const annotator = await imjoy.getPlugin('https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html')
+        await annotator.run()
     }
 }
 api.export(new ImJoyPlugin())
