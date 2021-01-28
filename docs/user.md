@@ -10,11 +10,12 @@ To directly try this annotation plugin in the browser, press the `Run` button be
 
 <!-- ImJoyPlugin: { "type": "web-worker", "hide_code_block": true} -->
 ```js
-class ImJoyPlugin{
-    async setup(){
-    }
-    async run(ctx){
-        api.alert("Please imlpement me ...")
+class ImJoyPlugin {
+    async setup() {}
+    async run(ctx) {
+        const imjoy = api; 
+        const plugin = await imjoy.getPlugin("https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/Nuclei-Cloud-Annotator.imjoy.html")
+        await plugin.run({config: {}, data: {}})
     }
 }
 api.export(new ImJoyPlugin())
