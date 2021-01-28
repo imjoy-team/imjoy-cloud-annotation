@@ -161,7 +161,7 @@ This script will download the entire data set to a user-specified folder. The da
 with one important change. The target files will be in stored in a dedicated folder in each sample folder named `target_files_vi`, 
 where `i` is a version number. `v0` is the originally provided target file, e.g. the original segmentation files, subsequent versions, e.g. `v1`, `v2` are created if for this sample a new annotation was submitted. 
 
-An status file (`status_file.json`) will be created in each sample folder providing detailed information about each version (who annotated it, when, ...). This allows to determine which user(s) annotated the samples.
+An status file (`sample_status.json`) will be created in each sample folder providing detailed information about each version (who annotated it, when, ...). This allows to determine which user(s) annotated the samples.
 
 Some important considerations
 

@@ -97,7 +97,7 @@ for sample_id in all_samples:
             continue
         
         # Save status
-        status_file = os.path.join(SAVE_DIR, sample_id,  f'target_files_{version}', 'status_file.json')
+        status_file = os.path.join(SAVE_DIR, sample_id, 'sample_status.json')
         with open(status_file, "w") as f:
             json.dump(sample_info["status"], f, indent=2)
                 

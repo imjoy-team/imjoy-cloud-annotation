@@ -25,7 +25,7 @@ For administrators, who want to **setup their own servers**, we refer to the ded
 While it is not important for the end user to know how this works, some of you might still be interested
 to get some understanding of what's behind the cloud annotation tool.
 
-![ai-server-schematic](assets/ai-server-schematic.png ':size=400')
+![ai-server-schematic](assets/ai-server-schematic.png ':size=600')
 
 1. **Data annotation** is done with a customized ImJoy plugin using [Kaibu](https://kaibu.org/#/app), which can be provided to the end user as a simple URL.
 2. Data can be **stored** locally or on remote (S3) server, and only the currently annotated imaged are downloaded locally. New annotations results will be sent back to the storage solution.
