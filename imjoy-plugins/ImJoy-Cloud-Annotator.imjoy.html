@@ -24,7 +24,7 @@ Documentation of API: https://ai.pasteur.fr/docs
 
 <script lang="javascript">
 
-const BASE_URL = 'https://api.imjoy.io'
+const BASE_URL = 'https://ai.pasteur.fr'
 
 
 class Client {
@@ -152,7 +152,7 @@ class ImJoyPlugin {
     }
 
   async run(ctx) {
-    const viewer = await api.showDialog({src: "https://kaibu.org/#/app", name: "Kaibu"})
+    const viewer = await api.showDialog({src: "https://kaibu.org/#/app", name: "Kaibu", fullscreen: true})
     const me = this;
     me.viewer = viewer;
 
