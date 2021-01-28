@@ -32,17 +32,17 @@ response = requests.get(
     BASE_URL + "/tasks", headers={"Authorization": f"Bearer {TOKEN}"}
 )
 response_obj = response.json()
+
 assert (
     response_obj["success"] == True
 ), f"Failed to requesting URL for upload, error: {response_obj['error']}"
 tasks = response_obj["result"]
 
-
 assert (
     TASK_ID in tasks
 ), f"Task {TASK_ID} not found, must be one of: {list(tasks.keys())}"
 
-
+# Create folder to save data if does not exist
 os.makedirs(SAVE_DIR, exist_ok=True)
 
 # downloading samples
@@ -72,8 +72,8 @@ for sample_id in all_samples:
         print("Failed to download "+response_obj["error"])
         continue
     result = response_obj["result"]
-    if result.get("input_files"):
-        continue
+    #if result.get("input_files"):
+    #    continue
     os.makedirs(os.path.join(SAVE_DIR, sample_id), exist_ok=True)
     print(f'    Saving to {os.path.join(SAVE_DIR, sample_id)}')
     
