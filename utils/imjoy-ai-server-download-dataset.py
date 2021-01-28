@@ -7,7 +7,7 @@
 # %% Imports
 import os
 import requests
-
+import json
 
 # %% Specify the task and data directory
 
@@ -71,16 +71,17 @@ for sample_id in all_samples:
     if not response_obj["success"]:
         print("Failed to download "+response_obj["error"])
         continue
-    result = response_obj["result"]
-    if not result.get("input_files"):
+    
+    sample_info = response_obj["result"]
+    if not sample_info.get("input_files"):
         continue
     os.makedirs(os.path.join(SAVE_DIR, sample_id), exist_ok=True)
     print(f'    Saving to {os.path.join(SAVE_DIR, sample_id)}')
     
     # Download input files
-    for file_name in result["input_files"]:
+    for file_name in sample_info["input_files"]:
         input_file = os.path.join(SAVE_DIR, sample_id, file_name)
-        download_url = result["input_files"][file_name]
+        download_url = sample_info["input_files"][file_name]
         response = requests.get(download_url, stream=True)
         if response.status_code == 200:
             with open(input_file, "wb") as fd:
@@ -90,11 +91,19 @@ for sample_id in all_samples:
             print(f"failed to download file: {file_name}, {response.reason}: {response.text}")
         
     # Download target files
-    for file_name in result["target_files"]:
-        target_versions = result["target_files"][file_name]
+    for file_name in sample_info["target_files"]:
+        target_versions = sample_info["target_files"][file_name]
         if len(target_versions) <= 0:
             continue
+        
+        # Save status
+        status_file = os.path.join(SAVE_DIR, sample_id,  f'target_files_{version}', 'status_file.json')
+        with open(status_file, "w") as f:
+            json.dump(sample_info["status"], f, indent=2)
+                
         for version in target_versions:
+            
+            # Save target file
             os.makedirs(os.path.join(SAVE_DIR, sample_id, f'target_files_{version}'), exist_ok=True)
             target_file = os.path.join(SAVE_DIR, sample_id,  f'target_files_{version}', file_name)
             download_url = target_versions[version]
@@ -103,8 +112,10 @@ for sample_id in all_samples:
                 with open(target_file, "wb") as fd:
                     for chunk in response.iter_content(chunk_size):
                         fd.write(chunk)
+                
             else:
                 print(f"Failed to download file: {file_name}, {response.reason}: {response.text}")
             
 
+            
 # %%
