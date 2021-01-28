@@ -76,7 +76,8 @@ for sample_id in all_samples:
         continue
     os.makedirs(os.path.join(SAVE_DIR, sample_id), exist_ok=True)
     print(f'    Saving to {os.path.join(SAVE_DIR, sample_id)}')
-    # upload input files
+    
+    # Download input files
     for file_name in result["input_files"]:
         input_file = os.path.join(SAVE_DIR, sample_id, file_name)
         download_url = result["input_files"][file_name]
@@ -88,7 +89,7 @@ for sample_id in all_samples:
         else:
             print(f"failed to download file: {file_name}, {response.reason}: {response.text}")
         
-    # upload target files
+    # Download target files
     for file_name in result["target_files"]:
         target_versions = result["target_files"][file_name]
         if len(target_versions) <= 0:
