@@ -8,7 +8,7 @@
   "type": "window",
   "tags": [],
   "ui": "",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "cover": "",
   "description": "[TODO: describe this plugin with one sentence.]",
   "icon": "extension",
@@ -133,7 +133,7 @@ const app = new Vue({
     tasks: null,
     status: {},
     taskInfo: null,
-    baseUrl: 'https://api.imjoy.io'
+    baseUrl: 'https://ai.pasteur.fr'
   },
   methods: {
     async login(){
@@ -153,8 +153,9 @@ const app = new Vue({
     async showToken(){
       api.alert(`Authorization Token:\n\n ${this.client.accessToken} \n\n(Use it in the HTTP "Authorization" header to access from other client.)`)
     },
-    async reloadTasks(){
-      let url = `${this.baseUrl}/tasks?reload=1`
+    async reloadTasks(reload){
+      reload = reload || 0;
+      let url = `${this.baseUrl}/tasks?reload=${reload}`
       this.$vs.loading()
       try{
         this.tasks = await this.client.get(url)
@@ -314,12 +315,17 @@ api.export(new ImJoyPlugin())
 
 <window lang="html">
    <div id="app">
-     <h1>Task Dashboard <vs-input
+     <h1>Task Dashboard
+      <vs-select
+        v-if="!client || !client.accessToken" 
         label="Server URL"
+        @change="reloadTasks(0)"
         v-model="baseUrl"
-        placeholder="https://api.imjoy.io"
-      ></vs-input></h1>
-     
+        >
+        <vs-select-item value="https://api.imjoy.io" text="api.imjoy.io"></vs-select-item>
+        <vs-select-item value="https://ai.pasteur.fr" text="ai.pasteur.fr"></vs-select-item>
+      </vs-select>
+      </h1>
      <vs-button v-if="!client || !client.accessToken" style="left: 50%;top: 100;transform: translate(-50%, 0px);" @click="login()" icon="login">Login</vs-button>
      <vs-dropdown v-if="this.tasks && tasks&&Object.keys(tasks).length>0">
        <vs-button type="line" icon="expand_more">{{selectedTask?selectedTask.name:'Tasks'}}</vs-button>
@@ -333,7 +339,7 @@ api.export(new ImJoyPlugin())
     <vs-dropdown v-if="client && client.accessToken" >
       <vs-button type="line" icon="more_horiz">More</vs-button>
       <vs-dropdown-menu>
-        <vs-dropdown-item @click="reloadTasks()" icon="refresh">
+        <vs-dropdown-item @click="reloadTasks(1)" icon="refresh">
           Reload Tasks
         </vs-dropdown-item>
         <vs-dropdown-item @click="showToken()" icon="info">
