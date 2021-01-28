@@ -14,7 +14,7 @@ import requests
 
 # %% Specify the task and data directory
 
-BASE_URL = "https://api.imjoy.io"
+BASE_URL = "https://ai.pasteur.fr"
 
 # Get the token from the AIServerDashboard plugin
 #  * https://imjoy.io/#/app?w=cloud-annotation&plugin=imjoy-team/imjoy-cloud-annotation:Task-Dashboard@stable&upgrade=1
