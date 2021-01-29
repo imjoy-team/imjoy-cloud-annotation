@@ -89,33 +89,36 @@ for sample_id in all_samples:
                     fd.write(chunk)
         else:
             print(f"failed to download file: {file_name}, {response.reason}: {response.text}")
-        
+
     # Download target files
     for file_name in sample_info["target_files"]:
         target_versions = sample_info["target_files"][file_name]
         if len(target_versions) <= 0:
             continue
-        
+
         # Save status
         status_file = os.path.join(SAVE_DIR, sample_id, 'sample_status.json')
         with open(status_file, "w") as f:
             json.dump(sample_info["status"], f, indent=2)
-                
+
         for version in target_versions:
-            
+
             # Save target file
             os.makedirs(os.path.join(SAVE_DIR, sample_id, f'target_files_{version}'), exist_ok=True)
             target_file = os.path.join(SAVE_DIR, sample_id,  f'target_files_{version}', file_name)
-            download_url = target_versions[version]
-            response = requests.get(download_url, stream=True)
-            if response.status_code == 200:
-                with open(target_file, "wb") as fd:
-                    for chunk in response.iter_content(chunk_size):
-                        fd.write(chunk)
-                
+            if file_name == "v0":
+                continue
             else:
-                print(f"Failed to download file: {file_name}, {response.reason}: {response.text}")
-            
+                download_url = target_versions[version]
+                response = requests.get(download_url, stream=True)
+                if response.status_code == 200:
+                    with open(target_file, "wb") as fd:
+                        for chunk in response.iter_content(chunk_size):
+                            fd.write(chunk)
+                else:
+                    print(f"Failed to download file: {file_name}, {response.reason}: {response.text}")
 
-            
+
+
+
 # %%
