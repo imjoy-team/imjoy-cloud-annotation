@@ -104,7 +104,7 @@ In image segmentation results are usually provided as label images, where each s
 
 In order to permit the user to modify these results, e.g. delete object(s) or add a new one, the images have to be converted into a GeoJson file.
 
-We provide some Python code, showing how to convert label images for a nuclear segmentation to json files. This code also reorganizes and renames the data according to the above defined requirements (`utils\imjoy-ai-server-prepare-dataset.py`).
+We provide some Python code, showing how to convert label images for a nuclear segmentation to json files. This code also reorganizes and renames the data according to the above defined requirements (`utils\prepare-dataset.py`).
 
 You can download some **test data** [here](https://www.dropbox.com/sh/hkr7xmpp9y5movz/AAAzHhbd-BhxNoA-1ZBQgviya?dl=0), with two folders:
 
@@ -113,7 +113,7 @@ You can download some **test data** [here](https://www.dropbox.com/sh/hkr7xmpp9y
 
 ### Upload data
 
-Once data is prepared, and a new task is created, a Python script (`utils\imjoy-ai-server-upload-dataset.py`) can be used to upload the data to the S3 data server:
+Once data is prepared, and a new task is created, a Python script (`utils\upload-dataset.py`) can be used to upload the data to the S3 data server:
 
 1. Use the `AIServerDashboard` (see above) to create a new task, you will be asked to provide a task id.
 2. Once the task is created, obtain a connection token by clicking on the `Info` button.
@@ -155,7 +155,7 @@ A **detailed description** for how to construct this urls and where plugin code 
 
 ## Retrieving data
 
-The data belonging to a task can also be retrieved from the storage server with the provided Python script (`utils\imjoy-ai-server-download-dataset.py`).
+The data belonging to a task can also be retrieved from the storage server with the provided Python script (`utils\download-dataset.py`).
 
 This script will download the entire data set to a user-specified folder. The data is organized as the uploaded data, 
 with one important change. The target files will be in stored in a dedicated folder in each sample folder named `target_files_vi`, 

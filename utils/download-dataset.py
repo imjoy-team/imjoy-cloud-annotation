@@ -69,7 +69,7 @@ for sample_id in all_samples:
         print(f"Failed to requesting URL for download, error: {response_obj.get('detail') or response_obj['error']}")
         continue
     if not response_obj["success"]:
-        print("Failed to download "+response_obj["error"])
+        print("Failed to download, error:"+response_obj["error"])
         continue
     
     sample_info = response_obj["result"]
