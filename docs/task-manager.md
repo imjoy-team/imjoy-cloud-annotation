@@ -175,6 +175,7 @@ An example for a status file is shown below. Many of the fields are self-explana
 
 - `target_version`: annotation version, value used for the naming of the `targe_files_vi folder`.
 - `metatadata`: can contain any additional information, e.g. some text.
+- `completed`: indicates if a samples has been annotated (`true`) or not (`false`). This field exists once for the sample, and in each user assigned version. Some tasks can set have multiple users per sample (`user_per_sample`). The sample will only be marked as completed when at least as many users as specfied completed their annotation.
 
 ``` json
 {
