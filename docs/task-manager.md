@@ -138,7 +138,7 @@ Kaibu permits further customization of this plugin, more information can be foun
 ### Distributing of annotation plugins
 
 ImJoy provides the possiblity to distribute a plugin wiht an URL. This URL references the actual plugin that 
-should be installed, and further optional information detailing how the plugin should be installed. 
+should be installed, and further optional information detailing how the plugin should be installed.
 
 As an example the URL shown below is for the Nuclei-Annotation plugin
 
@@ -159,11 +159,12 @@ The data belonging to a task can also be retrieved from the storage server with 
 
 This script will download the entire data set to a user-specified folder. The data is organized as the uploaded data, 
 with one important change. The target files will be in stored in a dedicated folder in each sample folder named `target_files_vi`, 
-where `i` is a version number. `v0` is the originally provided target file, e.g. the original segmentation files, subsequent versions, e.g. `v1`, `v2` are created if for this sample a new annotation was submitted. 
+where `i` is a version number. `v0` is the originally provided target file, e.g. the original segmentation files, subsequent versions, e.g. `v1`, `v2` are created if for this sample a new annotation was submitted.
 
-An status file (`sample_status.json`) will be created in each sample folder providing detailed information about each version (who annotated it, when, ...). This allows to determine which user(s) annotated the samples.
+A **status file (`sample_status.json`)** will be created in each sample folder providing detailed information about each version (who annotated it, when, ...). This allows to determine which user(s) annotated the samples.
 
-Some important considerations
+Some important aspects of **versions**:
 
 - The **version numbers are chronological** and not by user. So if different users work on the same task, their annotations will not have the same version number for different samples. 
+- When a user **obtains a sample**, a new version will be created. This version might not be completed if the user obtains the next sample before submitting the changes. This is refected by a field to indicate of the annotation was completed or not. 
 - A completed annotation of the **same sample by the same user** will results in two distinct versions.

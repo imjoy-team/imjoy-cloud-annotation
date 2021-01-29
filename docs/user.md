@@ -33,7 +33,7 @@ api.export(new ImJoyPlugin())
     1. You can toggle the display of a layer by clicking on the eye symbol next to its name.
     2. By clicking on the name of the layer a layer-specific context menu will be displayed (more details below). For instance, for images, you can change the contrast, and for vector layers, you can select objects and delete them, or draw new ones)
 
-## Annotate and submit a sample
+## Annotate, save and submit a sample
 
 1. Once a sample is open, you can select the annotation layer (‘vector’ in the example above). You can then:
     * **Delete** an object: choose the ‘Select’ tool, click on the object (it will change color), and press Delete.
