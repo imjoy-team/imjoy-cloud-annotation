@@ -90,9 +90,9 @@ for sample_id in all_samples:
             response.status_code == 200
         ), f"failed to upload file: {file_name}, {response.reason}: {response.text}"
 
-    # now enable this sample
+    # now refresh this sample
     response = requests.post(
-        BASE_URL + f"/task/{TASK_ID}/sample/{sample_id}/enable",
+        BASE_URL + f"/task/{TASK_ID}/sample/{sample_id}/refresh",
         headers={"Authorization": f"Bearer {TOKEN}"},
     )
     response_obj = response.json()
