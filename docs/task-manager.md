@@ -161,10 +161,41 @@ This script will download the entire data set to a user-specified folder. The da
 with one important change. The target files will be in stored in a dedicated folder in each sample folder named `target_files_vi`, 
 where `i` is a version number. `v0` is the originally provided target file, e.g. the original segmentation files, subsequent versions, e.g. `v1`, `v2` are created if for this sample a new annotation was submitted.
 
+### Status file
+
 A **status file (`sample_status.json`)** will be created in each sample folder providing detailed information about each version (who annotated it, when, ...). This allows to determine which user(s) annotated the samples.
 
 Some important aspects of **versions**:
 
 - The **version numbers are chronological** and not by user. So if different users work on the same task, their annotations will not have the same version number for different samples. 
-- When a user **obtains a sample**, a new version will be created. This version might not be completed if the user obtains the next sample before submitting the changes. This is refected by a field to indicate of the annotation was completed or not. 
+- When a user **obtains a sample**, a new version will be created. This version might not be completed if the user obtains the next sample before submitting the changes. This is refected by the field `completed` indicate of the annotation was completed or not.
 - A completed annotation of the **same sample by the same user** will results in two distinct versions.
+
+An example for a status file is shown below. Many of the fields are self-explanatory. 
+
+- `target_version`: annotation version, value used for the naming of the `targe_files_vi folder`.
+- `metatadata`: can contain any additional information, e.g. some text.
+- `completed`: indicates if a samples has been annotated (`true`) or not (`false`). This field exists once for the sample, and in each user assigned version. Some tasks can set have multiple users per sample (`user_per_sample`). The sample will only be marked as completed when at least as many users as specfied completed their annotation.
+
+``` json
+{
+    "users": {},
+    "actions": [
+        {
+            "session_id": "sample_2@v1",
+            "target_version": "v1",
+            "task_id": "demo-annotate-nuclei",
+            "sample_id": "sample_2",
+            "user_id": "google-oauth2|115789064117209337821",
+            "user_email": null,
+            "expires_at": 1611766046,
+            "started_at": null,
+            "completed": true,
+            "completed_at": null,
+            "metadata": {"image-label": "cat"}
+        }       
+    ],
+    "completed": false,
+    "completed_at": null
+}
+```
