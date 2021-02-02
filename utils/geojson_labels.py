@@ -12,14 +12,17 @@
 
 
 # %% Imports
-
+import random
+from skimage.io import imread, imsave
 import numpy as np
 from pathlib import Path
 from utils_annotation import geojson_to_label
 import json
 
 # %%
-path_results = Path(r'PASTE-PATH-TO-DATA')  # Folder with segmentation results from imjoy-cloud-annotation
+#path_results = Path(r'PASTE-PATH-TO-DATA')  # Folder with segmentation results from imjoy-cloud-annotation
+path_results = Path(r'//home/thomas/Bureau/phd/kaibu_data/test1')
+SAVE_ALSO_COLOR_IMAGE = True
 
 if not path_results.is_dir():
     print(f'Path to label does not exist: {path_results}')
@@ -41,4 +44,9 @@ for folder in path_results.glob("*/"):
             with open(str(json_file), encoding='utf-8-sig') as fh:
                 data_json = json.load(fh)
                 label = geojson_to_label(data_json, img_size, binary_labeling=False)
-                np.save(str(json_file)[:-5], label.astype(int))
+                imsave(str(json_file)[:-5] +".png", label.astype(int))
+                if SAVE_ALSO_COLOR_IMAGE:
+                    color_image = np.zeros([label.shape[0], label.shape[1], 3])
+                    for index in range(1,int(label.max())+1):
+                        color_image[label == index] += [random.randint(0, 256) for i in range(3)]
+                    imsave(str(json_file)[:-5] +"_random_color.png", color_image.astype(int))

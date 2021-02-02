@@ -199,3 +199,8 @@ An example for a status file is shown below. Many of the fields are self-explana
     "completed_at": null
 }
 ```
+### Convert GeoJson to label images
+
+The uploaded dataset contains the annotations in GeoJson files and not in label images.
+
+We provide Python script (`utils\geojson_labels.py`), showing how to convert GeoJson files to label images for a nuclear segmentation. This code takes as input the path to the uploaded dataset and saves label images next to each GeoJson file.
