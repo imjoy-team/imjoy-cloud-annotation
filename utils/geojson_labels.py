@@ -20,8 +20,8 @@ from utils_annotation import geojson_to_label
 import json
 
 # %%
-#path_results = Path(r'PASTE-PATH-TO-DATA')  # Folder with segmentation results from imjoy-cloud-annotation
-path_results = Path(r'//home/thomas/Bureau/phd/kaibu_data/test1')
+path_results = Path(r'PASTE-PATH-TO-DATA')  # Folder with segmentation results from imjoy-cloud-annotation
+
 SAVE_ALSO_COLOR_IMAGE = True
 
 if not path_results.is_dir():
@@ -48,5 +48,5 @@ for folder in path_results.glob("*/"):
                 if SAVE_ALSO_COLOR_IMAGE:
                     color_image = np.zeros([label.shape[0], label.shape[1], 3])
                     for index in range(1,int(label.max())+1):
-                        color_image[label == index] += [random.randint(0, 256) for i in range(3)]
+                        color_image[label == index] += [random.randint(0, 128) for i in range(3)] #128 in case there is overlapping
                     imsave(str(json_file)[:-5] +"_random_color.png", color_image.astype(int))

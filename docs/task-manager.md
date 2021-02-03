@@ -113,7 +113,7 @@ You can download some **test data** [here](https://www.dropbox.com/sh/hkr7xmpp9y
 
 ### Upload data
 
-Once data is prepared, and a new task is created, a Python script (`utils\upload-dataset.py`) can be used to upload the data to the S3 data server:
+Once data is prepared, and a new task is created, a Python script (`utils/upload-dataset.py`) can be used to upload the data to the S3 data server:
 
 1. Use the `AIServerDashboard` (see above) to create a new task, you will be asked to provide a task id.
 2. Once the task is created, obtain a connection token by clicking on the `Info` button.
@@ -155,7 +155,7 @@ A **detailed description** for how to construct this urls and where plugin code 
 
 ## Retrieving data
 
-The data belonging to a task can also be retrieved from the storage server with the provided Python script (`utils\download-dataset.py`).
+The data belonging to a task can also be retrieved from the storage server with the provided Python script (`utils/download-dataset.py`).
 
 This script will download the entire data set to a user-specified folder. The data is organized as the uploaded data, 
 with one important change. The target files will be in stored in a dedicated folder in each sample folder named `target_files_vi`, 
@@ -203,4 +203,4 @@ An example for a status file is shown below. Many of the fields are self-explana
 
 The uploaded dataset contains the annotations in GeoJson files and not in label images.
 
-We provide Python script (`utils\geojson_labels.py`), showing how to convert GeoJson files to label images for a nuclear segmentation. This code takes as input the path to the uploaded dataset and saves label images next to each GeoJson file.
+We provide Python script (`utils/geojson_labels.py`), showing how to convert GeoJson files to label images for a nuclear segmentation. This code takes as input the path to the uploaded dataset and saves label images next to each GeoJson file.
