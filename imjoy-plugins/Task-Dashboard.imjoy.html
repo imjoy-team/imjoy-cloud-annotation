@@ -8,7 +8,7 @@
   "type": "window",
   "tags": [],
   "ui": "",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "cover": "",
   "description": "[TODO: describe this plugin with one sentence.]",
   "icon": "extension",
@@ -218,6 +218,10 @@ const app = new Vue({
       else{
         taskInfo.owners = []
       }
+      taskInfo.user_per_sample = parseInt(taskInfo.user_per_sample)
+      taskInfo.expires_in = parseInt(taskInfo.expires_in)
+      taskInfo.min_completion_time = parseInt(taskInfo.min_completion_time)
+
 
       if(!this.client.isAdmin){
         taskInfo.dataset_dir = null
@@ -225,7 +229,7 @@ const app = new Vue({
       delete taskInfo.all_samples
       delete taskInfo.completed
       delete taskInfo.pending
-
+      debugger
       try{
         this.$vs.loading()
         if(taskId){
