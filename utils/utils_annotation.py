@@ -4,7 +4,7 @@ from geojson import Polygon as geojson_polygon
 from shapely.geometry import Polygon as shapely_polygon
 from geojson import Feature, FeatureCollection
 from skimage import measure
-
+from skimage.draw import  polygon
 
 def label_to_geojson(img_label, label, simplify_tol=1.5):
     """
@@ -67,3 +67,42 @@ def label_to_geojson(img_label, label, simplify_tol=1.5):
     feature_collection = FeatureCollection(features, bbox=[0, 0, img_label.shape[1]-1, img_label.shape[0]-1])
     
     return feature_collection, features
+
+def geojson_to_label(data_json, img_size, binary_labeling=False):
+    """
+    Function reading a geojson and returning a label image array
+
+    Args:
+      data_json (dict): dictionary in the geojson format containing coordionate of object to label
+      img_size (tuple int): size of the original labelled image
+      binary_labeling (bool): if True it does not separate connected componnent and use 1 as label for all polygon
+      if False the N objects are number 1,2,3,...N
+    """
+
+    def make_mask(roi_pos, img_size):
+        rr, cc = polygon(roi_pos[:, 0], roi_pos[:, 1])
+        # Make sure it's not outside
+        rr[rr < 0] = 0
+        rr[rr > img_size[0] - 1] = img_size[0] - 1
+        cc[cc < 0] = 0
+        cc[cc > img_size[1] - 1] = img_size[1] - 1
+        # Generate mask
+        mask = np.zeros(img_size, dtype=np.uint8)
+        mask[rr, cc] = 1
+        return mask
+
+    mask_loop = np.zeros(img_size)
+    for i in range(len(data_json['features'])):
+        try:
+            reg_pos = np.squeeze(np.asarray(data_json['features'][i]['geometry']['coordinates']))
+        except KeyError:
+            pass  # GeometryCollection
+        if len(reg_pos.shape) == 1:  # case where the label is a point
+            reg_pos = np.array([reg_pos])
+        reg_pos[:, [0, 1]] = reg_pos[:, [1, 0]]  # inverse coordinate from kaibu
+        reg_pos[:, 0] = -1*reg_pos[:, 0]+img_size[0]
+        if binary_labeling:
+            mask_loop += make_mask(reg_pos, img_size)
+        else:
+            mask_loop += make_mask(reg_pos, img_size) * (i+1)  # N objectS are number 1,2,3,...N
+    return mask_loop
