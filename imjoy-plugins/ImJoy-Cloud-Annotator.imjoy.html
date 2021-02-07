@@ -8,7 +8,7 @@ Documentation of API: https://ai.pasteur.fr/docs
   "type": "iframe",
   "tags": [],
   "ui": "",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "cover": "",
   "description": "Inspect and correct nuclear segmentation results",
   "icon": "extension",
@@ -170,20 +170,24 @@ class ImJoyPlugin {
           "type": "button",
           "label": "Get Sample",
           async callback(){
-            const sample = await me.getSample()
-            viewer.clear_layers()
-            for(const k of Object.keys(sample.input_files)){
-              await viewer.view_image(sample.input_files[k], {name: k})
+            try{
+              const sample = await me.getSample()
+              viewer.clear_layers()
+              for(const k of Object.keys(sample.input_files)){
+                await viewer.view_image(sample.input_files[k], {name: k})
+              }
+              me.annotation_layer = await viewer.add_shapes([], me.task_info['client_config'])
+              const geojson_url = sample.placeholder_files['annotation.json']
+              if(geojson_url){
+                const r= await fetch(geojson_url)
+                const features = await r.json()
+                await me.annotation_layer.add_features(features)
+              }
+              me.current_sample = sample
             }
-            me.annotation_layer = await viewer.add_shapes([], me.task_info['client_config'])
-            const geojson_url = sample.placeholder_files['annotation.json']
-            if(geojson_url){
-              const r= await fetch(geojson_url)
-              const features = await r.json()
-              await me.annotation_layer.add_features(features)
+            catch(e){
+              api.alert(e)
             }
-            me.current_sample = sample
-            
           },
       },
 
@@ -192,8 +196,13 @@ class ImJoyPlugin {
           "type": "button",
           "label": "Status",
           async callback(){
-            const info = await me.getTaskInfo()
-            api.alert(`Task: ${info.name}\n Progress: ${info.completed}/ ${info.all_samples}`)
+            try{
+              const info = await me.getTaskInfo()
+              api.alert(`Task: ${info.name}\n Progress: ${info.completed}/ ${info.all_samples}`)
+            }
+            catch(e){
+              api.alert(e)
+            }
           },
       },
 
