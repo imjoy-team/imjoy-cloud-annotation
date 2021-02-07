@@ -45,8 +45,8 @@ response = requests.get(
 )
 response_obj = response.json()
 assert (
-    response_obj["success"] == True
-), f"Failed to requesting URL for upload, error: {response_obj['error']}"
+    response_obj.get("success") == True
+), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
 tasks = response_obj["result"]
 
 
@@ -79,7 +79,7 @@ for sample_id in all_samples:
     )
     response_obj = response.json()
     assert (
-        response_obj["success"] == True
+        response_obj.get("success") == True
     ), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
     result = response_obj["result"]
     # upload files
@@ -105,7 +105,7 @@ for sample_id in all_samples:
         )
         response_obj = response.json()
         assert (
-            response_obj["success"] == True
+            response_obj.get("success") == True
         ), f"Failed to convert sample, error: {response_obj.get('detail') or response_obj['error']}"
         session_id = response_obj["result"]["session_id"]
         # check conversion status
@@ -132,7 +132,7 @@ for sample_id in all_samples:
     )
     response_obj = response.json()
     assert (
-        response_obj["success"] == True
+        response_obj.get("success") == True
     ), f"Failed to enable sample, error: {response_obj.get('detail') or response_obj['error']}"
 
     response = requests.get(
@@ -141,7 +141,7 @@ for sample_id in all_samples:
     )
     response_obj = response.json()
     assert (
-        response_obj["success"] == True
+        response_obj.get("success") == True
     ), f"Failed to enable sample, error: {response_obj.get('detail') or response_obj['error']}"
     for file in response_obj["result"]["files"]:
         url = response_obj["result"]["files"][file]

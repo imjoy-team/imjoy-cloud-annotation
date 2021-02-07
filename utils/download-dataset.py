@@ -34,8 +34,8 @@ response = requests.get(
 response_obj = response.json()
 
 assert (
-    response_obj["success"] == True
-), f"Failed to requesting URL for upload, error: {response_obj['error']}"
+    response_obj.get("success") == True
+), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
 tasks = response_obj["result"]
 
 assert (
@@ -52,7 +52,7 @@ response = requests.get(
 )
 
 response_obj = response.json()
-assert response_obj["success"] == True, "Failed to get samples"
+assert response_obj.get("success") == True, "Failed to get samples"
 
 all_samples = response_obj["result"]
 chunk_size = 1024 * 100
