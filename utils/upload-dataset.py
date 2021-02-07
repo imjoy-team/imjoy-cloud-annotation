@@ -38,7 +38,7 @@ response = requests.get(
 response_obj = response.json()
 assert (
     response_obj.get("success") == True
-), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
+), f"Failed to requesting URL for upload, error: {response_obj.get('detail')}"
 tasks = response_obj["result"]
 
 
@@ -62,7 +62,7 @@ for sample_id in all_samples:
     response_obj = response.json()
     assert (
         response_obj.get("success") == True
-    ), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
+    ), f"Failed to requesting URL for upload, error: {response_obj.get('detail')}"
     result = response_obj["result"]
 
     # upload input files
@@ -98,6 +98,6 @@ for sample_id in all_samples:
     response_obj = response.json()
     assert (
         response_obj.get("success") == True
-    ), f"Failed to enable sample, error: {response_obj.get('detail') or response_obj['error']}"
+    ), f"Failed to enable sample, error: {response_obj.get('detail')}"
 
 # %%

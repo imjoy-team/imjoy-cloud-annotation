@@ -35,7 +35,7 @@ response_obj = response.json()
 
 assert (
     response_obj.get("success") == True
-), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
+), f"Failed to requesting URL for upload, error: {response_obj.get('detail')}"
 tasks = response_obj["result"]
 
 assert (
@@ -66,10 +66,10 @@ for sample_id in all_samples:
     )
     response_obj = response.json()
     if response.status_code != 200:
-        print(f"Failed to requesting URL for download, error: {response_obj.get('detail') or response_obj['error']}")
+        print(f"Failed to requesting URL for download, error: {response_obj.get('detail')}")
         continue
     if not response_obj["success"]:
-        print("Failed to download, error:"+response_obj["error"])
+        print("Failed to download, error:"+response_obj.get('detail'))
         continue
     
     sample_info = response_obj["result"]

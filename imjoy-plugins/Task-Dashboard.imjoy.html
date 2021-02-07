@@ -8,7 +8,7 @@
   "type": "window",
   "tags": [],
   "ui": "",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "cover": "",
   "description": "[TODO: describe this plugin with one sentence.]",
   "icon": "extension",
@@ -51,7 +51,7 @@ class Client {
       return data.result
     }
     else{
-      throw new Error(data.error)
+      throw new Error(data.detail || data.error)
     }
   }
   async login(){

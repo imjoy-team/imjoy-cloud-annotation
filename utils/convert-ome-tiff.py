@@ -46,7 +46,7 @@ response = requests.get(
 response_obj = response.json()
 assert (
     response_obj.get("success") == True
-), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
+), f"Failed to requesting URL for upload, error: {response_obj.get('detail')}"
 tasks = response_obj["result"]
 
 
@@ -80,7 +80,7 @@ for sample_id in all_samples:
     response_obj = response.json()
     assert (
         response_obj.get("success") == True
-    ), f"Failed to requesting URL for upload, error: {response_obj.get('detail') or response_obj['error']}"
+    ), f"Failed to requesting URL for upload, error: {response_obj.get('detail')}"
     result = response_obj["result"]
     # upload files
     for file_name in UPLOAD_FILES:
@@ -106,7 +106,7 @@ for sample_id in all_samples:
         response_obj = response.json()
         assert (
             response_obj.get("success") == True
-        ), f"Failed to convert sample, error: {response_obj.get('detail') or response_obj['error']}"
+        ), f"Failed to convert sample, error: {response_obj.get('detail')}"
         session_id = response_obj["result"]["session_id"]
         # check conversion status
         while True:
@@ -117,7 +117,7 @@ for sample_id in all_samples:
             response_obj = response.json()
             assert (
                 response_obj.get("success") == True
-            ), f"Failed to get conversion status, error: {response_obj.get('detail') or response_obj['error']}"
+            ), f"Failed to get conversion status, error: {response_obj.get('detail')}"
             result = response_obj["result"]
             print(result["status"])
             if result['completed']:
@@ -133,7 +133,7 @@ for sample_id in all_samples:
     response_obj = response.json()
     assert (
         response_obj.get("success") == True
-    ), f"Failed to enable sample, error: {response_obj.get('detail') or response_obj['error']}"
+    ), f"Failed to enable sample, error: {response_obj.get('detail')}"
 
     response = requests.get(
         BASE_URL + f"/dataset/{DATASET_ID}/sample/{sample_id}",
@@ -142,7 +142,7 @@ for sample_id in all_samples:
     response_obj = response.json()
     assert (
         response_obj.get("success") == True
-    ), f"Failed to enable sample, error: {response_obj.get('detail') or response_obj['error']}"
+    ), f"Failed to enable sample, error: {response_obj.get('detail')}"
     for file in response_obj["result"]["files"]:
         url = response_obj["result"]["files"][file]
         print(f"{file}: {url}")
