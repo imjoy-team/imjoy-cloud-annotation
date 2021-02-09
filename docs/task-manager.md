@@ -133,7 +133,13 @@ const BASE_URL = 'https://api.imjoy.io'
 - `TASK_ID`: ID of the task
 - `BASE_URL` is the URL of the task management server, here our demo server.
 
-Kaibu permits further customization of this plugin, more information can be found in the dedicated section for the client developer. 
+### Complex annotation tasks
+
+The provided example above allows to draw new annotations. However, you can modify Kaibu
+and add more information to the annotation tasks with additional **widgets**. 
+
+For instance, in this [**Kaibu demo**](https://kaibu.org/docs/#/api?id=example-1-skin-image-annotation) we ask the user for classification of a potential tumor, permit
+to add a comment, and draw an polygon around the affected region:
 
 ### Distributing of annotation plugins
 
