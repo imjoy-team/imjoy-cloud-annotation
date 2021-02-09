@@ -4,7 +4,7 @@
 
 For each annotation/inspection task, you will receive a URL pointing to the web tool.
 
-For instance, to annotate the results of a nuclear segmentation, click [**here**](https://imjoy.io/#/app?w=cloud-annotation&plugin=imjoy-team/imjoy-cloud-annotation:Nuclei-Cloud-Annotator@stable&upgrade=1). This will open ImJoy in the browser and ask you to install the annotation plugin, confirm, and start the plugin by pressing its name (NUCLEI-Cloud-Annotator) in the side-bar on the left part of the interface.
+For instance, to annotate the results of a nuclear segmentation, click [**here**](https://imjoy.io/lite?plugin=https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html). This will open ImJoy in the browser and annotation tool.
 
 To directly try this annotation plugin in the browser, press the `Run` button below.
 
@@ -25,6 +25,7 @@ api.export(new ImJoyPlugin())
 
 1. When opening the annotation tool, you will see the basic interface with no data being shown.
 2. You then have to click on `Login`. Here, you can either create a new account or use login via an existing account elsewhere (Google account). If the login fails, please provide the email address that you used to the administrator such that you can be added to the white list of people allowed to access the task.
+3. Once you login, you will be presented with a pull-down menu where you can see all tasks that are available for your account. As an example, to annotate results of a nuclei segmentation demo select `demo-annotate-nuclei`.
 
 ## Display a sample
 
@@ -37,7 +38,7 @@ api.export(new ImJoyPlugin())
 
 1. Once a sample is open, you can select the annotation layer (‘vector’ in the example above). You can then:
     * **Delete** an object: choose the ‘Select’ tool, click on the object (it will change color), and press Delete.
-    * **Annotate** an object: choose the `Draw` tool and outline the object. 
+    * **Annotate** an object: choose the `Draw` tool and outline the object.
 2. Once you are done with the annotation of an image, you can
     * **Save**: which will submit your changes to the server, but NOT mark the sample as complete. You (or somebody else) can later continue working on this sample.
     * **Submit**: submit changes to the server, which will mark the sample being completed.

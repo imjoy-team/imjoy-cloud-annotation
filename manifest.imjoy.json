@@ -5,11 +5,11 @@
  "version": "0.2.0",
  "plugins": [
   {
-   "name": "Nuclei-Cloud-Annotator",
+   "name": "ImJoy-Cloud-Annotator",
    "type": "iframe",
    "tags": [],
    "ui": "",
-   "version": "0.1.0",
+   "version": "0.1.6",
    "cover": "",
    "description": "Inspect and correct nuclear segmentation results",
    "icon": "extension",
@@ -23,14 +23,14 @@
     "https://cdn.auth0.com/js/auth0-spa-js/1.12/auth0-spa-js.production.js"
    ],
    "dependencies": [],
-   "uri": "imjoy-plugins\\Nuclei-Cloud-Annotator.imjoy.html"
+   "uri": "imjoy-plugins\\ImJoy-Cloud-Annotator.imjoy.html"
   },
   {
    "name": "Task-Dashboard",
    "type": "window",
    "tags": [],
    "ui": "",
-   "version": "0.1.0",
+   "version": "0.1.19",
    "cover": "",
    "description": "[TODO: describe this plugin with one sentence.]",
    "icon": "extension",

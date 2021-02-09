@@ -121,7 +121,7 @@ Once data is prepared, and a new task is created, a Python script (`utils/upload
 
 ## Annotation plugin
 
-As a demo (see disclaimer above) for annotation plugin see [**here**](https://imjoy.io/#/app?w=cloud-annotation&plugin=imjoy-team/imjoy-cloud-annotation:Nuclei-Cloud-Annotator@stable&upgrade=1).
+As a demo (see disclaimer above) for annotation plugin see [**here**](https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html).
 
 This plugin provides all major features for multi-user annotation. In order to point it to a new annotation task, only two lines have to be changed:
 
@@ -137,14 +137,24 @@ Kaibu permits further customization of this plugin, more information can be foun
 
 ### Distributing of annotation plugins
 
-ImJoy provides the possiblity to distribute a plugin wiht an URL. This URL references the actual plugin that 
-should be installed, and further optional information detailing how the plugin should be installed.
+ImJoy provides the possiblity to distribute a plugin with an URL. This URL references the actual plugin, 
+(if required) additiona optional information detailing how the plugin should be installed.
 
-As an example the URL shown below is for the Nuclei-Annotation plugin
+You can also choose between using the **full** version or a **lite** version.
 
-``` url
-https://imjoy.io/#/app?w=cloud-annotation&plugin=imjoy-team/imjoy-cloud-annotation:Nuclei-Cloud-Annotator@stable&upgrade=1
-```
+- The **lite version** is best suited to send an easy to use plugin to the end-user, when clicking on the link the latest version
+  of the plugin will be started directly. We recommend this for most applications. Here, the URL starts with `https://imjoy.io/lite` 
+  To open the annotation plugin:
+
+  [https://imjoy.io/lite?plugin=https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html]((https://imjoy.io/lite?plugin=https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html))
+
+- When providing the link for the **full version**, a dialog will be shown to install the plugin, and then
+  manually start it by pressing the plugin name. In this interface, you can also inspect the code, install additional plugins, ... .
+  However, these additional steps before the plugin is running. Here, the URL starts with `https://imjoy.io/#/app`. As an example,
+
+  [https://imjoy.io/#/app?w=cloud-annotation&plugin=imjoy-team/imjoy-cloud-annotation:ImJoy-Cloud-Annotator@stable&upgrade=1](https://imjoy.io/#/app?w=cloud-annotation&plugin=imjoy-team/imjoy-cloud-annotation:ImJoy-Cloud-Annotator@stable&upgrade=1)
+
+### Hosting plugin code
 
 ImJoy provides a lot of flexibility for how to host your plugin codes. 
 

@@ -1,4 +1,4 @@
-<docs>
+﻿<docs>
 Documentation of API: https://ai.pasteur.fr/docs
 </docs>
 
@@ -8,7 +8,7 @@ Documentation of API: https://ai.pasteur.fr/docs
   "type": "iframe",
   "tags": [],
   "ui": "",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "cover": "",
   "description": "Inspect and correct nuclear segmentation results",
   "icon": "extension",
@@ -152,7 +152,7 @@ class ImJoyPlugin {
     }
 
   async run(ctx) {
-    const viewer = await api.showDialog({src: "https://kaibu.org/#/app", name: "Kaibu", fullscreen: true})
+    const viewer = await api.createWindow({src: "https://kaibu.org/#/app", name: "Kaibu", fullscreen: true})
     const me = this;
     me.viewer = viewer;
 
