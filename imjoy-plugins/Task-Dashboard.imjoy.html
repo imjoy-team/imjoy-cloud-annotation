@@ -8,7 +8,7 @@
   "type": "window",
   "tags": [],
   "ui": "",
-  "version": "0.1.19",
+  "version": "0.1.21",
   "cover": "",
   "description": "[TODO: describe this plugin with one sentence.]",
   "icon": "extension",
@@ -19,7 +19,7 @@
   "permissions": [],
   "requirements": ["https://cdn.jsdelivr.net/npm/vuesax/dist/vuesax.css", "https://unpkg.com/vue/dist/vue.js", "https://unpkg.com/vuesax", "https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js", "https://cdn.auth0.com/js/auth0-spa-js/1.12/auth0-spa-js.production.js", "https://cdn.jsdelivr.net/npm/material-design-icons-iconfont@6.1.0/dist/material-design-icons.min.css"],
   "dependencies": [],
-  "defaults": {"w": 20, "h": 10}
+  "defaults": {"w": 20, "h": 10, "as_dialog": true}
 }
 </config>
 
@@ -189,23 +189,30 @@ const app = new Vue({
       this.progress = this.taskInfo.completed/this.taskInfo.all_samples * 100
     },
     async saveTask(taskId){
-      const taskInfo = Object.assign({}, this.taskInfo)
-      delete taskInfo.last_id
-      if(taskInfo.client_config){
-        taskInfo.client_config = JSON.parse(taskInfo.client_config)
+      try{
+         const taskInfo = Object.assign({}, this.taskInfo)
+        delete taskInfo.last_id
+        if(taskInfo.client_config){
+          taskInfo.client_config = JSON.parse(taskInfo.client_config)
+        }
+        if(taskInfo.input_files){
+          taskInfo.input_files = JSON.parse(taskInfo.input_files)
+        }
+        if(taskInfo.target_files){
+          taskInfo.target_files = JSON.parse(taskInfo.target_files)
+        }
+        if(taskInfo.white_list){
+          taskInfo.white_list = JSON.parse(taskInfo.white_list)
+        }
+        if(taskInfo.black_list){
+          taskInfo.black_list = JSON.parse(taskInfo.black_list)
+        }
       }
-      if(taskInfo.input_files){
-        taskInfo.input_files = JSON.parse(taskInfo.input_files)
+      catch(e){
+        api.alert(`Wrong format, details ${e}`)
+        return
       }
-      if(taskInfo.target_files){
-        taskInfo.target_files = JSON.parse(taskInfo.target_files)
-      }
-      if(taskInfo.white_list){
-        taskInfo.white_list = JSON.parse(taskInfo.white_list)
-      }
-      if(taskInfo.black_list){
-        taskInfo.black_list = JSON.parse(taskInfo.black_list)
-      }
+     
       if(taskInfo.owners){
         const owners = taskInfo.owners.split(',')
         taskInfo.owners = []
@@ -289,7 +296,13 @@ const app = new Vue({
       if(!(await api.confirm(`Do you really want to remove task (${this.selectedTask.name})`))){
         return
       }
-      await this.client.delete(`${this.baseUrl}/task/${this.selectedTask.id}`)
+      if(this.selectedTask.tags && this.selectedTask.tags.includes('production')){
+        if(await api.prompt(`Do you really want to remove task (${this.selectedTask.name})`)!== this.selectedTask.id){
+          api.alert("confirmation code mismatch.")
+          return
+        }
+      }
+      await this.client.delete(`${this.baseUrl}/task/${this.selectedTask.id}?confirmation=${this.selectedTask.id}`)
       this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
       this.selectedTask = null;
       this.taskInfo = null;
@@ -382,6 +395,12 @@ api.export(new ImJoyPlugin())
             label="Description"
             v-model="taskInfo.description"
             placeholder="A new task"
+          ></vs-input>
+          <vs-input
+            v-if="client.isAdmin"
+            label="Dataset ID"
+            v-model="taskInfo.dataset_id"
+            placeholder=""
           ></vs-input>
           <vs-input
             v-if="client.isAdmin"
