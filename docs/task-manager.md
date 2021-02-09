@@ -146,7 +146,7 @@ You can also choose between using the **full** version or a **lite** version.
   of the plugin will be started directly. We recommend this for most applications. Here, the URL starts with `https://imjoy.io/lite` 
   To open the annotation plugin:
 
-  [https://imjoy.io/lite?plugin=https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html]((https://imjoy.io/lite?plugin=https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html))
+  [https://imjoy.io/lite?plugin=https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html](https://imjoy.io/lite?plugin=https://github.com/imjoy-team/imjoy-cloud-annotation/blob/main/imjoy-plugins/ImJoy-Cloud-Annotator.imjoy.html)
 
 - When providing the link for the **full version**, a dialog will be shown to install the plugin, and then
   manually start it by pressing the plugin name. In this interface, you can also inspect the code, install additional plugins, ... .
