@@ -49,7 +49,7 @@ Sampling Method         | choise     | How the samples are selected `sequential`
 User per sample | number | how many users can open a sample at the same time.
 Minimal completion time (s) | number | Minimal time before a user can request a new sample.
 Task visibility         | choice     | `public`: can be seen by all users, except users on the `blacklist` (email addresses). `protected`: task can be seen only by users listed in `whitelist` (email addresses).
-Sample visibility       | choice     | `open`: all samples can be openly accessed,`protected`: users can only see 1 assigned sample at a time, not allowed to jump too any sample for annotation.
+Sample visibility       | choice     | `public`: all samples can be openly accessed, also simultaneously by multiple users; `protected`: users can only see 1 assigned sample at a time, which will be assigned, not allowed to jump to any sample for annotation.
 Sample Status File Name | string     | Name of file that will be created once a sample has been annotated by a user.
 Expires in (s) | number | Duration after which a file will be released when being open by a user and not be resubmitted. 
 client config | string | Configuration for the client (Kaibu). The proposed default creates a vector layer for polygon annotation.
