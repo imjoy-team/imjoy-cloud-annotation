@@ -1,519 +1,549 @@
 <docs lang="markdown">
-[TODO: write documentation for this plugin.]
-</docs>
-
-<config lang="json">
-{
-  "name": "Task-Dashboard",
-  "type": "window",
-  "tags": [],
-  "ui": "",
-  "version": "0.1.21",
-  "cover": "",
-  "description": "[TODO: describe this plugin with one sentence.]",
-  "icon": "extension",
-  "inputs": null,
-  "outputs": null,
-  "api_version": "0.1.8",
-  "env": "",
-  "permissions": [],
-  "requirements": ["https://cdn.jsdelivr.net/npm/vuesax/dist/vuesax.css", "https://unpkg.com/vue/dist/vue.js", "https://unpkg.com/vuesax", "https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js", "https://cdn.auth0.com/js/auth0-spa-js/1.12/auth0-spa-js.production.js", "https://cdn.jsdelivr.net/npm/material-design-icons-iconfont@6.1.0/dist/material-design-icons.min.css"],
-  "dependencies": [],
-  "defaults": {"w": 20, "h": 10, "as_dialog": true}
-}
-</config>
-
-<script lang="javascript">
-
-class Client {
-  constructor(baseURL){
-    this.baseURL = baseURL
-    this.accessToken = null
+  [TODO: write documentation for this plugin.]
+  </docs>
+  
+  <config lang="json">
+  {
+    "name": "Task-Dashboard",
+    "type": "window",
+    "tags": [],
+    "ui": "",
+    "version": "0.1.23",
+    "cover": "",
+    "description": "[TODO: describe this plugin with one sentence.]",
+    "icon": "extension",
+    "inputs": null,
+    "outputs": null,
+    "api_version": "0.1.8",
+    "env": "",
+    "permissions": [],
+    "requirements": ["https://cdn.jsdelivr.net/npm/vuesax/dist/vuesax.css", "https://unpkg.com/vue/dist/vue.js", "https://unpkg.com/vuesax", "https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js", "https://cdn.auth0.com/js/auth0-spa-js/1.12/auth0-spa-js.production.js", "https://cdn.jsdelivr.net/npm/material-design-icons-iconfont@6.1.0/dist/material-design-icons.min.css"],
+    "dependencies": [],
+    "defaults": {"w": 20, "h": 10, "as_dialog": true}
   }
-  async makeRequest(url, method, json){
-    if(!this.accessToken) {
-      await this.login()
+  </config>
+  
+  <script lang="javascript">
+  
+  class Client {
+    constructor(baseURL){
+      this.baseURL = baseURL
+      this.accessToken = null
     }
-    if(!url.startsWith('http') && !url.startsWith('/')) url = this.baseURL + '/' + url;
-    const headers = {'Authorization': `Bearer ${this.accessToken}`}
-    let body = undefined
-    if(json){
-        headers['Content-Type'] = 'application/json'
-        body = JSON.stringify(json)
-    }
-    const response = await fetch(url, {
-      method,
-      headers,
-      body
-    })
-    const data = await response.json()
-    if(data.success){
-      return data.result
-    }
-    else{
-      throw new Error(data.detail || data.error)
-    }
-  }
-  async login(){
-    const auth0 = await createAuth0Client({
-      domain: 'imjoy.eu.auth0.com',
-      client_id: 'ofsvx6A7LdMhG0hklr5JCAEawLv4Pyse'
-    })
-    await auth0.loginWithPopup({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
-    //logged in. you can get the user profile like this:
-    const user = await auth0.getUser();
-    this.isAdmin = false;
-    if(user){
-      if(!user.email_verified){
-        api.alert(`Please verify your email (${user.email}) by clicking the link sent from Auth0.`)
-        return
+    async makeRequest(url, method, json){
+      if(!this.accessToken) {
+        await this.login()
       }
-      this.userInfo = user;
-      if(user['https://api.imjoy.io/roles'].includes('admin'))
-        this.isAdmin = true
-      console.log(user);
-    }
-    this.auth0 = auth0;
-    this.accessToken = await auth0.getTokenSilently({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
-  }
-  async logout(){
-    if(!this.auth0) {
-      api.showMessage("You haven't logged in.")
-      return;
-    }
-    await this.auth0.logout();
-  }
-  async get(url){
-    return this.makeRequest(url, 'GET')
-  }
-  async put(url, json){
-    return this.makeRequest(url, 'PUT', json)
-  }
-  async post(url, json){
-    return this.makeRequest(url, 'POST', json)
-  }
-  async delete(url){
-    return this.makeRequest(url, 'DELETE')
-  }
-}
-
-const TASK_TEMPLATE = {
-  "type": "annotation",
-  "name": "MY Task",
-  "description": "[TODO]",
-  "dataset_dir": null,
-  "input_files": ["input-1.txt"],
-  "target_files": ["target-1.txt"],
-  "task_visibility": "public",
-  "sample_visibility": "protected",
-  "sampling_method": "sequential",
-  "min_completion_time": 0,
-  "user_per_sample": 1,
-  "allow_user_upload": false,
-  "owners": [],
-  "client_config": {
-      "draw_enable": true,
-      "draw_label": "cell",
-      "draw_shape_type": "polygon",
-      "draw_freehand": true,
-      "draw_edge_color": "#0BF737",
-  },
-  "expires_in": 3600,
-  "sample_status_file": null,
-}
-
-const app = new Vue({
-  el: '#app',
-  data: {
-    taskInfo: {},
-    showCard: 'status',
-    progress: 0,
-    client: null,
-    selectedTask: null,
-    tasks: null,
-    status: {},
-    taskInfo: null,
-    baseUrl: 'https://ai.pasteur.fr'
-  },
-  methods: {
-    async login(){
-      this.$vs.loading()
-      try{
-        this.client = new Client(this.baseUrl)
-        this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
-        this.selectTask(this.tasks[Object.keys(this.tasks)[0]])
+      if(!url.startsWith('http') && !url.startsWith('/')) url = this.baseURL + '/' + url;
+      const headers = {'Authorization': `Bearer ${this.accessToken}`}
+      let body = undefined
+      if(json){
+          headers['Content-Type'] = 'application/json'
+          body = JSON.stringify(json)
       }
-      catch(e){
-        api.alert(`Failed to connect to the backend server, error: ${e}`)
-      }
-      finally{
-        this.$vs.loading.close()
-      }
-    },
-    async showToken(){
-      api.alert(`Authorization Token:\n\n ${this.client.accessToken} \n\n(Use it in the HTTP "Authorization" header to access from other client.)`)
-    },
-    async reloadTasks(reload){
-      reload = reload || 0;
-      let url = `${this.baseUrl}/tasks?reload=${reload}`
-      this.$vs.loading()
-      try{
-        this.tasks = await this.client.get(url)
-      }
-      finally{
-        this.$vs.loading.close()
-      }
-      api.showMessage('Task reloaded.')
-    },
-    async showStatus(taskId){
-      this.showCard = 'status'
-      try{
-        this.$vs.loading()
-        this.taskInfo = await this.client.get(`${this.baseUrl}/task/${taskId || this.selectedTask.id}`)
-      }
-      finally{
-        setTimeout(()=>{
-          this.$vs.loading.close()
-        }, 200)  
-      }
-      this.initTaskInfo()
-    },
-    initTaskInfo(){
-      this.taskInfo.last_id = this.taskInfo.id
-      this.taskInfo.client_config = JSON.stringify(this.taskInfo.client_config)
-      this.taskInfo.input_files = JSON.stringify(this.taskInfo.input_files)
-      this.taskInfo.target_files = JSON.stringify(this.taskInfo.target_files)
-      this.taskInfo.white_list = JSON.stringify(this.taskInfo.white_list)
-      this.taskInfo.black_list = JSON.stringify(this.taskInfo.black_list)
-      this.taskInfo.owners = this.taskInfo.owners.join(",")
-      this.progress = this.taskInfo.completed/this.taskInfo.all_samples * 100
-    },
-    async saveTask(taskId){
-      try{
-         const taskInfo = Object.assign({}, this.taskInfo)
-        delete taskInfo.last_id
-        if(taskInfo.client_config){
-          taskInfo.client_config = JSON.parse(taskInfo.client_config)
-        }
-        if(taskInfo.input_files){
-          taskInfo.input_files = JSON.parse(taskInfo.input_files)
-        }
-        if(taskInfo.target_files){
-          taskInfo.target_files = JSON.parse(taskInfo.target_files)
-        }
-        if(taskInfo.white_list){
-          taskInfo.white_list = JSON.parse(taskInfo.white_list)
-        }
-        if(taskInfo.black_list){
-          taskInfo.black_list = JSON.parse(taskInfo.black_list)
-        }
-      }
-      catch(e){
-        api.alert(`Wrong format, details ${e}`)
-        return
-      }
-     
-      if(taskInfo.owners){
-        const owners = taskInfo.owners.split(',')
-        taskInfo.owners = []
-        for(let o of owners){
-          if(!taskInfo.owners.includes(o)){
-            taskInfo.owners.push(o)
-          }
-        }
+      const response = await fetch(url, {
+        method,
+        headers,
+        body
+      })
+      const data = await response.json()
+      if(data.success){
+        return data.result
       }
       else{
-        taskInfo.owners = []
+        throw new Error(data.detail || data.error)
       }
-      taskInfo.user_per_sample = parseInt(taskInfo.user_per_sample)
-      taskInfo.expires_in = parseInt(taskInfo.expires_in)
-      taskInfo.min_completion_time = parseInt(taskInfo.min_completion_time)
-
-
-      if(!this.client.isAdmin){
-        taskInfo.dataset_dir = null
-      }
-      delete taskInfo.all_samples
-      delete taskInfo.completed
-      delete taskInfo.pending
-      try{
-        this.$vs.loading()
-        if(taskId){
-          // create a new task
-          await this.client.put(`${this.baseUrl}/task/${taskId}`, taskInfo)
-          this.showStatus(taskId)
-          api.showMessage('Task created.')
-        }
-        else{
-          // update an existing task
-          await this.client.post(`${this.baseUrl}/task/${taskInfo.id}/update`, taskInfo)
-          api.showMessage('Task saved.')
-        }
-        
-      }
-      catch(e){
-        alert(`Failed to save task, ${e}`)
-        throw e
-      }
-      finally{
-        this.$vs.loading.close()
-      }
-    },
-    async newTask(){
-      const taskId = await api.prompt('Please type a unique task ID', 'my-awesome-task')
-      if(this.tasks[taskId]){
-        api.alert(`Task with id=${taskId} already exists, please choose a different one`)
-        return
-      }
-      this.taskInfo = TASK_TEMPLATE
-      this.initTaskInfo()
-      // clear dataset_dir
-      this.taskInfo.dataset_dir = null
-      
-      if(taskId){
-        this.taskInfo.id = taskId
-      }
-    },
-    async saveNewTask(){
-      const taskId = this.taskInfo.id
-      this.taskInfo.dataset_dir = null
-      if(this.tasks[taskId]){
-        api.alert(`Task with id=${taskId} already exists, please choose a different one`)
-        return
-      }
-      if(Object.values(this.tasks).map(t=>t.name).includes(this.taskInfo.name)){
-         api.alert(`Please choose a different name for the task`)
-         return
-      }
-      if(taskId){
-        this.$vs.loading()
-        await this.saveTask(taskId)
-        this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
-        this.showStatus(taskId)
-      }
-    },
-    async removeTask(){
-      if(!(await api.confirm(`Do you really want to remove task (${this.selectedTask.name})`))){
-        return
-      }
-      if(this.selectedTask.tags && this.selectedTask.tags.includes('production')){
-        if(await api.prompt(`Do you really want to remove task (${this.selectedTask.name})`)!== this.selectedTask.id){
-          api.alert("confirmation code mismatch.")
+    }
+    async login(){
+      const auth0 = await createAuth0Client({
+        domain: 'imjoy.eu.auth0.com',
+        client_id: 'ofsvx6A7LdMhG0hklr5JCAEawLv4Pyse'
+      })
+      await auth0.loginWithPopup({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
+      //logged in. you can get the user profile like this:
+      const user = await auth0.getUser();
+      this.isAdmin = false;
+      if(user){
+        if(!user.email_verified){
+          api.alert(`Please verify your email (${user.email}) by clicking the link sent from Auth0.`)
           return
         }
+        this.userInfo = user;
+        if(user['https://api.imjoy.io/roles'].includes('admin'))
+          this.isAdmin = true
+        console.log(user);
       }
-      await this.client.delete(`${this.baseUrl}/task/${this.selectedTask.id}?confirmation=${this.selectedTask.id}`)
-      this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
-      this.selectedTask = null;
-      this.taskInfo = null;
-      await api.showMessage('Task has been removed.')
-    },
-    selectTask(task){
-      this.selectedTask=task
-      if(task)
-      this.showStatus()
+      this.auth0 = auth0;
+      this.accessToken = await auth0.getTokenSilently({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
+    }
+    async logout(){
+      if(!this.auth0) {
+        api.showMessage("You haven't logged in.")
+        return;
+      }
+      await this.auth0.logout();
+    }
+    async get(url){
+      return this.makeRequest(url, 'GET')
+    }
+    async put(url, json){
+      return this.makeRequest(url, 'PUT', json)
+    }
+    async post(url, json){
+      return this.makeRequest(url, 'POST', json)
+    }
+    async delete(url){
+      return this.makeRequest(url, 'DELETE')
     }
   }
-})
-
-class ImJoyPlugin {
-  async setup() {
-
-  }
-
-  async run(ctx) {
-
-  }
-}
-
-api.export(new ImJoyPlugin())
-</script>
-
-<window lang="html">
-   <div id="app">
-     <h1>Task Dashboard
-      <vs-select
-        v-if="!client || !client.accessToken" 
-        label="Server URL"
-        v-model="baseUrl"
-        >
-        <vs-select-item value="https://api.imjoy.io" text="api.imjoy.io"></vs-select-item>
-        <vs-select-item value="https://ai.pasteur.fr" text="ai.pasteur.fr"></vs-select-item>
-      </vs-select>
-      </h1>
-     <vs-button v-if="!client || !client.accessToken" style="left: 50%;top: 100;transform: translate(-50%, 0px);" @click="login()" icon="login">Login</vs-button>
-     <vs-dropdown v-if="this.tasks && tasks&&Object.keys(tasks).length>0">
-       <vs-button type="line" icon="expand_more">{{selectedTask?selectedTask.name:'Tasks'}}</vs-button>
-      <vs-dropdown-menu>
-        <vs-dropdown-item v-for="task in tasks" @click="selectTask(task)" :key="task.id">
-          {{task.name}}
-        </vs-dropdown-item>
-      </vs-dropdown-menu>
-    </vs-dropdown>
-    <vs-button v-if="this.tasks" type="line" @click="newTask()" icon="add">New Task</vs-button>
-    <vs-dropdown v-if="client && client.accessToken" >
-      <vs-button type="line" icon="more_horiz">More</vs-button>
-      <vs-dropdown-menu>
-        <vs-dropdown-item @click="reloadTasks(1)" icon="refresh">
-          Reload Tasks
-        </vs-dropdown-item>
-        <vs-dropdown-item @click="showToken()" icon="info">
-          Connection Token
-        </vs-dropdown-item>
-        <vs-dropdown-item @click="client.logout()">
-          Logout
-        </vs-dropdown-item>
-      </vs-dropdown-menu>
-    </vs-dropdown>
-      <br>
-      <p v-if="tasks && showCard == 'status' && !taskInfo">No task selected.</p>
-      <vs-card v-if="showCard == 'status' && taskInfo" style="display: inline-block;">
-        <h2>{{taskInfo.name}} (id: {{taskInfo.id}}) <vs-button v-if="this.tasks" type="flat" @click="showStatus()" icon="refresh"></vs-button></h2>
-        <h4>{{taskInfo.description}}</h4>
-        <br>
-        <h4>Completed: {{taskInfo.completed}}/{{taskInfo.all_samples}}</h4>
-        <vs-progress :percent="progress" color="primary">Task progress</vs-progress>
-        <br>
-        <br>
-        <div>
-          <vs-input
-            label="ID"
-            v-model="taskInfo.id"
-            placeholder="new-task"
-          ></vs-input>
-          <vs-input
-            label="Name"
-            v-model="taskInfo.name"
-            placeholder="New Task"
-          ></vs-input>
-          <vs-input
-            label="Type"
-            v-model="taskInfo.type"
-            placeholder="annotation"
-          ></vs-input>
-          <vs-input
-            label="Description"
-            v-model="taskInfo.description"
-            placeholder="A new task"
-          ></vs-input>
-          <vs-input
-            v-if="client.isAdmin"
-            label="Dataset ID"
-            v-model="taskInfo.dataset_id"
-            placeholder=""
-          ></vs-input>
-          <vs-input
-            v-if="client.isAdmin"
-            label="Dataset Directory"
-            v-model="taskInfo.dataset_dir"
-            placeholder=""
-          ></vs-input>
-          <vs-input
-            label="Owners (seperate by comma)"
-            v-model="taskInfo.owners"
-            placeholder=""
-          ></vs-input>
-          <label for="">Allow User Upload</label>
-          <vs-switch v-model="taskInfo.allow_user_upload"></vs-switch>
-          <vs-input
-            label="Input Files"
-            v-model="taskInfo.input_files"
-            placeholder=""
-          ></vs-input>
-          <vs-input
-            label="Target Files"
-            v-model="taskInfo.target_files"
-            placeholder=""
-          ></vs-input>
-          <vs-select
-            label="Sampling Method"
-            v-model="taskInfo.sampling_method"
-            >
-            <vs-select-item value="sequential" text="sequential"></vs-select-item>
-            <vs-select-item value="random" text="random"></vs-select-item>
-          </vs-select>
-          <vs-input
-            label="User per Sample"
-            v-model="taskInfo.user_per_sample"
-            type="number"
-            min="1"
-            placeholder="1"
-          ></vs-input>
-          <vs-input
-            label="Minimal Completion Time (s)"
-            v-model="taskInfo.min_completion_time"
-            type="number"
-            min="0"
-            placeholder=""
-          ></vs-input>
-          <vs-select
-            label="Task Visibility"
-            v-model="taskInfo.task_visibility"
-            >
-            <vs-select-item value="public" text="public"></vs-select-item>
-            <vs-select-item value="protected" text="protected"></vs-select-item>
-          </vs-select>
-          <vs-input
-            v-if="taskInfo.task_visibility=='protected'"
-            label="Whitelist Users"
-            v-model="taskInfo.white_list"
-            placeholder=""
-          ></vs-input>
-          
-          <vs-input
-            v-if="taskInfo.task_visibility=='public'"
-            label="Blacklist Users"
-            v-model="taskInfo.black_list"
-            placeholder=""
-          ></vs-input>
-
-          <vs-select
-            label="Sample Visibility"
-            v-model="taskInfo.sample_visibility"
-            >
-            <vs-select-item value="public" text="public"></vs-select-item>
-            <vs-select-item value="protected" text="protected"></vs-select-item>
-          </vs-select>
-
-          <vs-input
-            label="Sample Status File Name"
-            v-model="taskInfo.sample_status_file"
-            placeholder=""
-          ></vs-input>
-
-          <vs-input
-            label="Expires in (s)"
-            v-model="taskInfo.expires_in"
-            type="number"
-            placeholder="3600"
-            min="1"
-          ></vs-input>
-          <vs-textarea label="Client Config" v-model="taskInfo.client_config" placeholder="{}"> </vs-textarea>
-          <vs-button v-if="taskInfo.last_id == taskInfo.id" type="border" @click="saveTask()" icon="save">Save Task</vs-button>
-          <vs-button v-else type="border" @click="saveNewTask()" icon="add">Save New Task</vs-button>
-          &nbsp;&nbsp;
-          <vs-button v-if="tasks[taskInfo.id]" type="border" color="danger" @click="removeTask()" icon="remove">Remove Task</vs-button>
-        </div>
-      </vs-card>
   
-    </div>
-</window>
-
-<style lang="css">
-#app{
-  padding: 10px;
-}
-body, button, input {
-  font-family: Poppins,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
-}
-.vs-con-input-label {
-  width: 100%;
-}
-.con-select {
-  width: 100%;
-}
-.vs-textarea{
-  width: 100%;
-  font-family: Poppins,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
-}
-</style>
+  const TASK_TEMPLATE = {
+    "type": "annotation",
+    "name": "MY Task",
+    "description": "[TODO]",
+    "dataset_dir": null,
+    "input_files": ["input-1.txt"],
+    "target_files": ["target-1.txt"],
+    "task_visibility": "public",
+    "sample_visibility": "protected",
+    "sampling_method": "sequential",
+    "min_completion_time": 0,
+    "user_per_sample": 1,
+    "allow_user_upload": false,
+    "owners": [],
+    "client_config": {
+        "draw_enable": true,
+        "draw_label": "cell",
+        "draw_shape_type": "polygon",
+        "draw_freehand": true,
+        "draw_edge_color": "#0BF737",
+    },
+    "expires_in": 3600,
+    "sample_status_file": null,
+  }
+  
+  const app = new Vue({
+    el: '#app',
+    data: {
+      taskInfo: {},
+      showCard: 'status',
+      progress: 0,
+      client: null,
+      selectedTask: null,
+      tasks: null,
+      status: {},
+      taskInfo: null,
+      baseUrl: 'https://ai.pasteur.fr'
+    },
+    methods: {
+      async login(){
+        this.$vs.loading()
+        try{
+          this.client = new Client(this.baseUrl)
+          this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
+          this.selectTask(this.tasks[Object.keys(this.tasks)[0]])
+        }
+        catch(e){
+          api.alert(`Failed to connect to the backend server, error: ${e}`)
+        }
+        finally{
+          this.$vs.loading.close()
+        }
+      },
+      async showToken(){
+        api.alert(`Authorization Token:\n\n ${this.client.accessToken} \n\n(Use it in the HTTP "Authorization" header to access from other client.)`)
+      },
+      async reloadTasks(reload){
+        reload = reload || 0;
+        let url = `${this.baseUrl}/tasks?reload=${reload}`
+        this.$vs.loading()
+        try{
+          this.tasks = await this.client.get(url)
+        }
+        finally{
+          this.$vs.loading.close()
+        }
+        api.showMessage('Task reloaded.')
+      },
+      async showStatus(taskId){
+        this.showCard = 'status'
+        try{
+          this.$vs.loading()
+          this.taskInfo = await this.client.get(`${this.baseUrl}/task/${taskId || this.selectedTask.id}`)
+        }
+        finally{
+          setTimeout(()=>{
+            this.$vs.loading.close()
+          }, 200)  
+        }
+        this.initTaskInfo()
+      },
+      initTaskInfo(){
+        this.taskInfo.last_id = this.taskInfo.id
+        this.taskInfo.client_config = JSON.stringify(this.taskInfo.client_config, null, '\t')
+        this.taskInfo.input_files = this.taskInfo.input_files || []
+        this.taskInfo.input_files = this.taskInfo.input_files.join(", ")
+        this.taskInfo.target_files = this.taskInfo.target_files || []
+        this.taskInfo.target_files = this.taskInfo.target_files.join(", ")
+        this.taskInfo.black_list = this.taskInfo.black_list || []
+        this.taskInfo.black_list = this.taskInfo.black_list.join(", ")
+        this.taskInfo.white_list = this.taskInfo.white_list || []
+        this.taskInfo.white_list = this.taskInfo.white_list.join(", ")
+        this.taskInfo.tags = this.taskInfo.tags || []
+        this.taskInfo.tags = this.taskInfo.tags.join(", ")
+        this.taskInfo.owners = this.taskInfo.owners || []
+        this.taskInfo.owners = this.taskInfo.owners.join(", ")
+        this.progress = this.taskInfo.completed_count/this.taskInfo.all_count * 100
+      },
+      async saveTask(taskId){
+        const taskInfo = Object.assign({}, this.taskInfo)
+        try{
+          delete taskInfo.last_id
+          if(taskInfo.client_config){
+            taskInfo.client_config = JSON.parse(taskInfo.client_config)
+          }
+          if(taskInfo.input_files.length>0){
+            taskInfo.input_files = taskInfo.input_files.trim().split(/\s*,\s*/)
+          }
+          else{
+            taskInfo.input_files = []
+          }
+  
+          if(taskInfo.target_files.length>0){
+            taskInfo.target_files = taskInfo.target_files.trim().split(/\s*,\s*/)
+          }
+          else{
+            taskInfo.target_files = []
+          }
+  
+          if(taskInfo.black_list.length>0){
+            taskInfo.black_list = taskInfo.black_list.trim().split(/\s*,\s*/)
+          }
+          else{
+            taskInfo.black_list = []
+          }
+  
+          if(taskInfo.white_list.length>0){
+            taskInfo.white_list = taskInfo.white_list.trim().split(/\s*,\s*/)
+          }
+          else{
+            taskInfo.white_list = []
+          }
+  
+          if(taskInfo.tags.length>0){
+            taskInfo.tags = taskInfo.tags.trim().split(/\s*,\s*/)
+          }
+          else{
+            taskInfo.tags = []
+          }
+        
+          if(taskInfo.owners.length>0){
+            taskInfo.owners = taskInfo.owners.trim().split(/\s*,\s*/)
+          }
+          else{
+            taskInfo.owners = []
+          }
+          taskInfo.user_per_sample = parseInt(taskInfo.user_per_sample)
+          taskInfo.expires_in = parseInt(taskInfo.expires_in)
+          taskInfo.min_completion_time = parseInt(taskInfo.min_completion_time)
+  
+  
+          if(!this.client.isAdmin){
+            taskInfo.dataset_dir = null
+          }
+  
+        }
+        catch(e){
+          api.alert(`Wrong format, details ${e}`)
+          return
+        }
+  
+        try{
+          this.$vs.loading()
+          if(taskId){
+            // create a new task
+            await this.client.put(`${this.baseUrl}/task/${taskId}`, taskInfo)
+            this.showStatus(taskId)
+            api.showMessage('Task created.')
+          }
+          else{
+            // update an existing task
+            await this.client.post(`${this.baseUrl}/task/${taskInfo.id}/update`, taskInfo)
+            api.showMessage('Task saved.')
+          }
+          
+        }
+        catch(e){
+          alert(`Failed to save task, ${e}`)
+          throw e
+        }
+        finally{
+          this.$vs.loading.close()
+        }
+      },
+      async newTask(){
+        const taskId = await api.prompt('Please type a unique task ID', 'my-awesome-task')
+        if(this.tasks[taskId]){
+          api.alert(`Task with id=${taskId} already exists, please choose a different one`)
+          return
+        }
+        this.taskInfo = TASK_TEMPLATE
+        this.initTaskInfo()
+        // clear dataset_dir
+        this.taskInfo.dataset_dir = null
+        
+        if(taskId){
+          this.taskInfo.id = taskId
+        }
+      },
+      async saveNewTask(){
+        const taskId = this.taskInfo.id
+        this.taskInfo.dataset_dir = null
+        if(this.tasks[taskId]){
+          api.alert(`Task with id=${taskId} already exists, please choose a different one`)
+          return
+        }
+        if(Object.values(this.tasks).map(t=>t.name).includes(this.taskInfo.name)){
+           api.alert(`Please choose a different name for the task`)
+           return
+        }
+        if(taskId){
+          this.$vs.loading()
+          await this.saveTask(taskId)
+          this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
+          this.showStatus(taskId)
+        }
+      },
+      async removeTask(){
+        if(!(await api.confirm(`Do you really want to remove task (${this.selectedTask.name})`))){
+          return
+        }
+        if(this.selectedTask.tags && this.selectedTask.tags.includes('production')){
+          if(await api.prompt(`Do you really want to remove task (${this.selectedTask.name})`)!== this.selectedTask.id){
+            api.alert("confirmation code mismatch.")
+            return
+          }
+        }
+        await this.client.delete(`${this.baseUrl}/task/${this.selectedTask.id}?confirmation=${this.selectedTask.id}`)
+        this.tasks = await this.client.get(`${this.baseUrl}/tasks`)
+        this.selectedTask = null;
+        this.taskInfo = null;
+        await api.showMessage('Task has been removed.')
+      },
+      selectTask(task){
+        this.selectedTask=task
+        if(task)
+        this.showStatus()
+      }
+    }
+  })
+  
+  class ImJoyPlugin {
+    async setup() {
+  
+    }
+  
+    async run(ctx) {
+  
+    }
+  }
+  
+  api.export(new ImJoyPlugin())
+  </script>
+  
+  <window lang="html">
+     <div id="app">
+       <h1>Task Dashboard
+        <vs-select
+          v-if="!client || !client.accessToken" 
+          label="Server URL"
+          v-model="baseUrl"
+          >
+          <vs-select-item value="https://api.imjoy.io" text="api.imjoy.io"></vs-select-item>
+          <vs-select-item value="https://ai.pasteur.fr" text="ai.pasteur.fr"></vs-select-item>
+        </vs-select>
+        </h1>
+       <vs-button v-if="!client || !client.accessToken" style="left: 50%;top: 100;transform: translate(-50%, 0px);" @click="login()" icon="login">Login</vs-button>
+       <vs-dropdown v-if="this.tasks && tasks&&Object.keys(tasks).length>0">
+         <vs-button type="line" icon="expand_more">{{selectedTask?selectedTask.name:'Tasks'}}</vs-button>
+        <vs-dropdown-menu>
+          <vs-dropdown-item v-for="task in tasks" @click="selectTask(task)" :key="task.id">
+            {{task.name}}
+          </vs-dropdown-item>
+        </vs-dropdown-menu>
+      </vs-dropdown>
+      <vs-button v-if="this.tasks" type="line" @click="newTask()" icon="add">New Task</vs-button>
+      <vs-dropdown v-if="client && client.accessToken" >
+        <vs-button type="line" icon="more_horiz">More</vs-button>
+        <vs-dropdown-menu>
+          <vs-dropdown-item @click="reloadTasks(1)" icon="refresh">
+            Reload Tasks
+          </vs-dropdown-item>
+          <vs-dropdown-item @click="showToken()" icon="info">
+            Connection Token
+          </vs-dropdown-item>
+          <vs-dropdown-item @click="client.logout()">
+            Logout
+          </vs-dropdown-item>
+        </vs-dropdown-menu>
+      </vs-dropdown>
+        <br>
+        <p v-if="tasks && showCard == 'status' && !taskInfo">No task selected.</p>
+        <vs-card v-if="showCard == 'status' && taskInfo" style="display: inline-block;">
+          <h2>{{taskInfo.name}} (id: {{taskInfo.id}}) <vs-button v-if="this.tasks" type="flat" @click="showStatus()" icon="refresh"></vs-button></h2>
+          <h4>{{taskInfo.description}}</h4>
+          <br>
+          <h4>Completed: {{taskInfo.completed_count}}/{{taskInfo.all_count}}</h4>
+          <vs-progress :percent="progress" color="primary">Task progress</vs-progress>
+          <br>
+          <br>
+          <div>
+            <vs-input
+              label="ID"
+              v-model="taskInfo.id"
+              placeholder="new-task"
+            ></vs-input>
+            <vs-input
+              label="Name"
+              v-model="taskInfo.name"
+              placeholder="New Task"
+            ></vs-input>
+            <vs-input
+              label="Type"
+              v-model="taskInfo.type"
+              placeholder="annotation"
+            ></vs-input>
+            <vs-input
+              label="Description"
+              v-model="taskInfo.description"
+              placeholder="A new task"
+            ></vs-input>
+            <vs-input
+              v-if="client.isAdmin"
+              label="Dataset ID"
+              v-model="taskInfo.dataset_id"
+              placeholder=""
+            ></vs-input>
+            <vs-input
+              v-if="client.isAdmin"
+              label="Dataset Directory"
+              v-model="taskInfo.dataset_dir"
+              placeholder=""
+            ></vs-input>
+            <vs-input
+              label="Owners (seperate emails by comma)"
+              v-model="taskInfo.owners"
+              placeholder=""
+            ></vs-input>
+            <label for="">Allow User Upload</label>
+            <vs-switch v-model="taskInfo.allow_user_upload"></vs-switch>
+            <vs-input
+              label="Input Files (seperate file names by comma)"
+              v-model="taskInfo.input_files"
+              placeholder=""
+            ></vs-input>
+            <vs-input
+              label="Target Files (seperate file names by comma)"
+              v-model="taskInfo.target_files"
+              placeholder=""
+            ></vs-input>
+            <vs-select
+              label="Sampling Method"
+              v-model="taskInfo.sampling_method"
+              >
+              <vs-select-item value="sequential" text="sequential"></vs-select-item>
+              <vs-select-item value="random" text="random"></vs-select-item>
+            </vs-select>
+            <vs-input
+              label="User per Sample"
+              v-model="taskInfo.user_per_sample"
+              type="number"
+              min="1"
+              placeholder="1"
+            ></vs-input>
+            <vs-input
+              label="Minimal Completion Time (s)"
+              v-model="taskInfo.min_completion_time"
+              type="number"
+              min="0"
+              placeholder=""
+            ></vs-input>
+            <vs-select
+              label="Task Visibility"
+              v-model="taskInfo.task_visibility"
+              >
+              <vs-select-item value="public" text="public"></vs-select-item>
+              <vs-select-item value="protected" text="protected"></vs-select-item>
+            </vs-select>
+            <vs-input
+              v-if="taskInfo.task_visibility=='protected'"
+              label="Whitelist Users (seperate emails by comma)"
+              v-model="taskInfo.white_list"
+              placeholder=""
+            ></vs-input>
+            
+            <vs-input
+              v-if="taskInfo.task_visibility=='public'"
+              label="Blacklist Users"
+              v-model="taskInfo.black_list"
+              placeholder=""
+            ></vs-input>
+  
+            <vs-select
+              label="Sample Visibility"
+              v-model="taskInfo.sample_visibility"
+              >
+              <vs-select-item value="public" text="public"></vs-select-item>
+              <vs-select-item value="protected" text="protected"></vs-select-item>
+            </vs-select>
+  
+            <!-- <vs-input
+              label="Sample Status File Name"
+              v-model="taskInfo.sample_status_file"
+              placeholder=""
+            ></vs-input> -->
+  
+            <vs-input
+              label="Expires in (s)"
+              v-model="taskInfo.expires_in"
+              type="number"
+              placeholder="3600"
+              min="1"
+            ></vs-input>
+  
+            <vs-input
+              label="Tags (seperate tags by comma)"
+              v-model="taskInfo.tags"
+              placeholder=""
+            ></vs-input>
+  
+            <vs-textarea label="Client Config (in JSON format)" v-model="taskInfo.client_config" placeholder="{}"> </vs-textarea>
+            <vs-button v-if="taskInfo.last_id == taskInfo.id" type="border" @click="saveTask()" icon="save">Save Task</vs-button>
+            <vs-button v-else type="border" @click="saveNewTask()" icon="add">Save New Task</vs-button>
+            &nbsp;&nbsp;
+            <vs-button v-if="tasks[taskInfo.id]" type="border" color="danger" @click="removeTask()" icon="remove">Remove Task</vs-button>
+          </div>
+        </vs-card>
+    
+      </div>
+  </window>
+  
+  <style lang="css">
+  #app{
+    padding: 10px;
+  }
+  body, button, input {
+    font-family: Poppins,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+  }
+  .vs-con-input-label {
+    width: 100%;
+  }
+  .con-select {
+    width: 100%;
+  }
+  .vs-textarea{
+    width: 100%;
+    font-family: Poppins,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+  }
+  </style>
+  

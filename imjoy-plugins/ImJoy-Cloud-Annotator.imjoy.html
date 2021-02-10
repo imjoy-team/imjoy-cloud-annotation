@@ -8,7 +8,7 @@ Documentation of API: https://ai.pasteur.fr/docs
   "type": "iframe",
   "tags": [],
   "ui": "",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "cover": "",
   "description": "Inspect and correct nuclear segmentation results",
   "icon": "extension",
@@ -198,7 +198,10 @@ class ImJoyPlugin {
           async callback(){
             try{
               const info = await me.getTaskInfo()
-              api.alert(`Task: ${info.name}\n Progress: ${info.completed}/ ${info.all_samples}`)
+              api.alert(`Task: ${info.name}\n Progress: ${info.completed_count}/ ${info.all_count}\nAvailable Samples: ${info.available_count}`)
+              if(info.all_count){
+                await api.showProgress((info.all_count-info.available_count)/info.all_count*100)
+              }
             }
             catch(e){
               api.alert(e)
@@ -227,6 +230,14 @@ class ImJoyPlugin {
               await me.saveAnnotation(features)
               await me.markComplete()
               await viewer.clear_layers()
+              // update the progress
+              const info = await me.getTaskInfo()
+              if(info.all_count){
+                await api.showProgress((info.all_count-info.available_count)/info.all_count*100)
+              }
+            }
+            else{
+              api.alert("No sample annotated")
             }
           },
       },
@@ -251,7 +262,12 @@ class ImJoyPlugin {
                         async callback(taskId){
                           if(tasks[taskId]){
                               try{
-                                me.task_info =  tasks[taskId]     
+                                me.task_info =  tasks[taskId]
+                                // check the progress
+                                const info = await me.getTaskInfo()
+                                if(info.all_count){
+                                  await api.showProgress((info.all_count-info.available_count)/info.all_count*100)
+                                }  
                                 const samples = await me.client.get(`${BASE_URL}/task/${taskId}/all`)
                                 const nodes = samples.map(s => ({title:s, isLeaf: true}))
                                 await me.task_tree.clear_nodes()
