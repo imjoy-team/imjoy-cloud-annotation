@@ -43,14 +43,18 @@ CONVERT_FILES = {"image.dm3": "image.ome.tif"}
 
 # %% Download and rename example file
 #  Here, you can also use your own images instead
-os.makedirs(os.path.join(DATASET_DIR, 'dnasample1'), exist_ok=True)
-r = requests.get("https://samples.scif.io/dnasample1.zip", allow_redirects=True)
-file_zip = os.path.join(DATASET_DIR, 'dnasample1.zip')
-open(file_zip, 'wb').write(r.content)
-with zipfile.ZipFile(os.path.join(DATASET_DIR, 'dnasample1.zip'), 'r') as zip_ref:
-    zip_ref.extractall(DATASET_DIR)
-os.rename(os.path.join(DATASET_DIR, 'dnasample1.dm3'), os.path.join(DATASET_DIR, 'dnasample1', 'image.dm3'))
-os.remove(file_zip)
+path_demo = os.path.join(DATASET_DIR, 'dnasample1')
+if not os.path.exists(path_demo):
+    os.makedirs(path_demo, exist_ok=True)
+    r = requests.get("https://samples.scif.io/dnasample1.zip", allow_redirects=True)
+    file_zip = os.path.join(DATASET_DIR, 'dnasample1.zip')
+    open(os.path.join(DATASET_DIR, 'dnasample1.zip'), 'wb').write(r.content)
+    with zipfile.ZipFile(os.path.join(DATASET_DIR, 'dnasample1.zip'), 'r') as zip_ref:
+        zip_ref.extractall(DATASET_DIR)
+    os.rename(os.path.join(DATASET_DIR, 'dnasample1.dm3'), os.path.join(DATASET_DIR, 'dnasample1', 'image.dm3'))
+    os.remove(file_zip)
+else:
+    print(f'Path for demo data already exists: {path_demo}')
 
 
 # %% Connect to task server
