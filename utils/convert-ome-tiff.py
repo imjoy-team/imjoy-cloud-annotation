@@ -1,4 +1,7 @@
-# %% Upload data to ImJoy S3 annotation server and perform conversion
+# %% Upload data to ImJoy S3 annotation server and perform conversion to zarr array
+#
+#  Script will download some example data and illustrate how it can be uploaded. 
+#
 #  DISCLAIMER: FOR DEMO PURPOSES ONLY
 #   The ImJoy team has full access to these data, and reservers
 #   all rights to delete data as any moment.
@@ -11,7 +14,7 @@
 import os
 import time
 import requests
-
+import zipfile
 
 # %% Specify the task and data directory
 
@@ -22,7 +25,6 @@ BASE_URL = "https://ai.pasteur.fr"
 #  * Login as an admin user and click the info button to copy the token string
 TOKEN = "PASTE THE TOKEN HERE"
 
-
 # This is the dataset_id which you want to upload new samples to
 # You can create a new task and a dataset with the same id will be created
 # In the task, please add `["image.ome.tif", "image.ome.tif_offsets.json"]` as `input_files`
@@ -30,14 +32,28 @@ TOKEN = "PASTE THE TOKEN HERE"
 DATASET_ID = "my-dataset-id"
 
 # Define the folder with data
-# As an example, you can download and extract this sample image in dm3 format: https://samples.scif.io/dnasample1.zip
+#  - As an example, an image in the dm3 (Gatan Digital Micrograph) format will be downloaed further down from this address https://samples.scif.io/dnasample1.zip
+#  - You can adapt this to your own images.
 DATASET_DIR = "./data"
 UPLOAD_FILES = ["image.dm3"]
 
 # convert image.dm3 to image.ome.tif
 CONVERT_FILES = {"image.dm3": "image.ome.tif"}
 
-# %% Upload data to the server
+
+# %% Download and rename example file
+#  Here, you can also use your own images instead
+os.makedirs(os.path.join(DATASET_DIR, 'dnasample1'), exist_ok=True)
+r = requests.get("https://samples.scif.io/dnasample1.zip", allow_redirects=True)
+file_zip = os.path.join(DATASET_DIR, 'dnasample1.zip')
+open(file_zip, 'wb').write(r.content)
+with zipfile.ZipFile(os.path.join(DATASET_DIR, 'dnasample1.zip'), 'r') as zip_ref:
+    zip_ref.extractall(DATASET_DIR)
+os.rename(os.path.join(DATASET_DIR, 'dnasample1.dm3'), os.path.join(DATASET_DIR, 'dnasample1', 'image.dm3'))
+os.remove(file_zip)
+
+
+# %% Connect to task server
 
 # listing tasks
 response = requests.get(
@@ -49,22 +65,12 @@ assert (
 ), f"Failed to requesting URL for upload, error: {response_obj.get('detail')}"
 tasks = response_obj["result"]
 
-
 assert (
     DATASET_ID in tasks
 ), f"Task {DATASET_ID} not found, must be one of: {list(tasks.keys())}"
 
 
-# %% download example file
-os.makedirs(os.path.join(DATASET_DIR, 'dnasample1'), exist_ok=True)
-r = requests.get("https://samples.scif.io/dnasample1.zip", allow_redirects=True)
-open(os.path.join(DATASET_DIR, 'dnasample1.zip'), 'wb').write(r.content)
-import zipfile
-with zipfile.ZipFile(os.path.join(DATASET_DIR, 'dnasample1.zip'), 'r') as zip_ref:
-    zip_ref.extractall(DATASET_DIR)
-os.rename(os.path.join(DATASET_DIR, 'dnasample1.dm3'), os.path.join(DATASET_DIR, 'dnasample1', 'image.dm3'))
-
-# upload a sample to the task
+# %% Upload sample(s) to the task
 count = 0
 all_samples = os.listdir(DATASET_DIR)
 for sample_id in all_samples:

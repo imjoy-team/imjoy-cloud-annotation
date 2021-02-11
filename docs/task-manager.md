@@ -64,7 +64,7 @@ differentiated access policies can be put into place
 adminstrators of the AI server.
 - The `Task visibility` allows to **determine who else can see the task**. 
   - `public` means that everybody can access a task, except users being blacklisted.
-  - `protected` means that only users listed on the `whitelist` can access the task. 
+  - `protected` means that only users listed on the `whitelist` can access the task.
 
 ### Completing a task
 
