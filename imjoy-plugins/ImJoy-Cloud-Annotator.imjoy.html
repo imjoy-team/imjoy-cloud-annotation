@@ -1,4 +1,4 @@
-﻿<docs>
+<docs>
 Documentation of API: https://ai.pasteur.fr/docs
 </docs>
 
@@ -157,7 +157,7 @@ class ImJoyPlugin {
     me.viewer = viewer;
 
     const controls = [
-        {
+         {
             _rintf: true,
             "type": "button",
             "label": "Logout",
@@ -166,7 +166,7 @@ class ImJoyPlugin {
             },
         },
         {
-          "_rintf": true,
+           _rintf: true,
           "type": "button",
           "label": "Get Sample",
           async callback(){
@@ -192,7 +192,7 @@ class ImJoyPlugin {
       },
 
       {
-            _rintf: true,
+           _rintf: true,
           "type": "button",
           "label": "Status",
           async callback(){
@@ -251,42 +251,53 @@ class ImJoyPlugin {
                 "type": "button",
                 "label": "Login",
                 async callback(){
-                  await me.client.login()
-                  const tasks = await me.getTasks()
-                  const newControls = [
-                    {
-                        "_rintf": true,
-                        "type": "dropdown",
-                        "label": "Task",
-                        "options": Object.keys(tasks),
-                        async callback(taskId){
-                          if(tasks[taskId]){
-                              me.taskId = taskId;
-                              try{
-                                me.task_info =  tasks[taskId]
-                                // check the progress
-                                const info = await me.getTaskInfo()
-                                if(info.all_count){
-                                  await api.showProgress((info.all_count-info.available_count)/info.all_count*100)
-                                }  
-                                const samples = await me.client.get(`${BASE_URL}/task/${taskId}/all`)
-                                const nodes = samples.map(s => ({title:s, isLeaf: true}))
-                                await me.task_tree.clear_nodes()
-                                await  me.task_tree.set_nodes(nodes)
-                                api.showMessage("Successfully logged in.")
-                              }
-                              catch(e){
-                                api.alert(`Failed to access the task(${me.taskId}, error: ${e}`) 
-                              }
-                            
-                          }
-                          controlWidget.set_elements(newControls.concat(controls))
-                        },
-                    },
-                  ]
-                  controlWidget.set_elements(newControls)
+                  try{
+                    await me.client.login()
+                  }
+                  catch(e){
+                    api.alert(`Failed to login: ${e}`)
+                  }
+                  try{
+                    const tasks = await me.getTasks()
+                    const newControls = [
+                      {
+                          _rintf: true,
+                          "type": "dropdown",
+                          "label": "Task",
+                          "options": Object.keys(tasks),
+                          async callback(taskId){
+                            if(tasks[taskId]){
+                                me.taskId = taskId;
+                                try{
+                                  me.task_info =  tasks[taskId]
+                                  // check the progress
+                                  const info = await me.getTaskInfo()
+                                  if(info.all_count){
+                                    await api.showProgress((info.all_count-info.available_count)/info.all_count*100)
+                                  }  
+                                  const samples = await me.client.get(`${BASE_URL}/task/${taskId}/all`)
+                                  const nodes = samples.map(s => ({title:s, isLeaf: true}))
+                                  await me.task_tree.clear_nodes()
+                                  await  me.task_tree.set_nodes(nodes)
+                                  api.showMessage("Successfully logged in.")
+                                }
+                                catch(e){
+                                  api.alert(`Failed to access the task(${me.taskId}, error: ${e}`) 
+                                }
+                              
+                            }
+                            controlWidget.set_elements(newControls.concat(controls))
+                          },
+                      },
+                    ]
+                    controlWidget.set_elements(newControls)
+                  }
+                  catch(e){
+                    api.alert(`Failed to initialize the task: ${e}`)
+                  }
                 },
             },
+           
         ],
     })
 
