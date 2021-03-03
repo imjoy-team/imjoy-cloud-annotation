@@ -275,7 +275,7 @@
               "owners": taskInfo.owners,
               "dataset_visibility": taskInfo.task_visibility
             }
-            await this.client.post(`${this.baseUrl}/dataset/${taskInfo.id}/update`, taskInfo)
+            await this.client.post(`${this.baseUrl}/dataset/${taskInfo.id}/update`, datasetInfo)
             api.showMessage('Task saved.')
           }
           
