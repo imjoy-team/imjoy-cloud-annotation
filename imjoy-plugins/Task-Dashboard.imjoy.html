@@ -61,7 +61,7 @@
       })
       await auth0.loginWithPopup({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
       //logged in. you can get the user profile like this:
-      const user = await auth0.getUser();
+      const user = await auth0.getUser({audience: 'https://imjoy.eu.auth0.com/api/v2/'});
       this.isAdmin = false;
       if(user){
         if(!user.email_verified){
